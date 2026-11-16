@@ -1,0 +1,1223 @@
+{
+  "version": 49,
+  "constants": {
+    "ORIGINAL_SHA256": "2fcf85dfb73f61188e1bc8c811ab76f74659f7a317b6f25ed05cc0a919aea3e3",
+    "LIBRARY": "lib/armeabi-v7a/libmain.so",
+    "HOOK": "0x9c78ec",
+    "READ_MATERIALS": "0x3d4cf0",
+    "FAST_LIST_INSERT": "0x3c92c0",
+    "LOAD_HOOK": "0x8d279c",
+    "LOAD_SPRITE_BANK": "0x3ca3e8",
+    "RESET_HOOK": "0x9c77d4",
+    "TRUNCATE_SPRITE_BANK": "0x3d4ce4",
+    "COMPOSITE_IMAGE_HOOK": "0x8d2764",
+    "LOAD_SPRITE_IMAGE": "0x3c91e8",
+    "OBJECT_SCRIPT_EXISTS_HOOK": "0xad7b9c",
+    "GRANT_ICON_HOOK": "0x6a9dd0",
+    "DISK_FILE_EXISTS": "0x3b02f4",
+    "ARCHIVE_FILE_EXISTS": "0x3c13e8",
+    "STARTUP_MOD_HOOK": "0x7418fc",
+    "INITIALISE_RENDERER": "0x3c8b34",
+    "READ_MOD_TYPES": "0x7b286c",
+    "INITIALISE_MODS": "0x3ccb18",
+    "NATIVE_ATLAS_HOOKS": [
+      [
+        "0x8d26a4",
+        "0xe5978004",
+        "load_native_atlas",
+        true
+      ],
+      [
+        "0x8d34e0",
+        "0xe3a00018",
+        "defer_atlas_allocation",
+        false
+      ],
+      [
+        "0x8d36d0",
+        "0xe58da0a0",
+        "check_decoded_sprite",
+        false
+      ],
+      [
+        "0x8d38c4",
+        "0xebebf0ff",
+        "reserve_native_atlas_space",
+        true
+      ],
+      [
+        "0x8d390c",
+        "0xe1a0508a",
+        "native_atlas_pack_failed",
+        false
+      ],
+      [
+        "0x8d3b78",
+        "0xe59d0034",
+        "allocate_packed_atlas",
+        false
+      ],
+      [
+        "0x8d3cd4",
+        "0xebebefe9",
+        "copy_sprite_rgba4444",
+        true
+      ],
+      [
+        "0x91f730",
+        "0xe5950014",
+        "read_portrait_pixel",
+        true
+      ],
+      [
+        "0xb4243c",
+        "0xe5940014",
+        "read_image_pixel",
+        true
+      ],
+      [
+        "0x9c83d4",
+        "0xebe80392",
+        "base_materials_first",
+        true
+      ],
+      [
+        "0x74b624",
+        "0xebf1f728",
+        "load_mod_language",
+        true
+      ]
+    ],
+    "NATIVE_ATLAS_IMPORTS": {
+      "load_user_sprite_images": "0x8d34b8",
+      "list_sprite_paths": "0x8d3538",
+      "add_valid_sprite": "0x8d36d4",
+      "close_sprite_reader": "0x8d3760",
+      "clear_old_sprite_offsets": "0x8d3b7c",
+      "erase_sprite_offset_tree": "0x3cfc50",
+      "free_sprite_inputs": "0x8d3f38",
+      "delete_object": "0x3abbd8",
+      "new_object": "0x3abbfc",
+      "new_array": "0x3adbc4",
+      "copy_bytes": "0x3abc08",
+      "zero_bytes": "0x3ac550",
+      "debug_log": "0x3b2484",
+      "gl_get_integer": "0x3c8888",
+      "bitmap_destroy": "0x3cc9bc",
+      "append_rectangle": "0x3ce4b0",
+      "store_portrait_pixel": "0x91f73c",
+      "store_image_pixel": "0xb42448",
+      "get_mod_file_paths": "0x3c9224",
+      "load_language_table": "0x3c92cc",
+      "move_bytes": "0x3b06f0",
+      "delete_array": "0x3adb4c",
+      "apply_object_definition": "0x9c8e50",
+      "skip_object_definition": "0x9c8ee8",
+      "apply_equipment_definition": "0x9c9130",
+      "skip_equipment_definition": "0x9c91a8",
+      "apply_material_definition": "0x9c9394",
+      "skip_material_definition": "0x9c9544",
+      "apply_room_definition": "0x9c97e8",
+      "skip_room_definition": "0x9ca128",
+      "apply_callout_definition": "0x9ca2a0",
+      "skip_callout_definition": "0x9ca2e8",
+      "set_drawable_id": "0x3ac448"
+    },
+    "SPRITE_REPLACEMENT_IMPORTS": {
+      "lookup_sprite": "0x8cbdd4",
+      "sprite_rect": "0x8cb358",
+      "get_binary_reader": "0x3c16c4",
+      "get_text_reader": "0x3b4d70",
+      "load_bitmap_font": "0x3ca1b4",
+      "list_archive": "0x3c16b8",
+      "list_directory": "0x3c9128",
+      "destroy_file_paths": "0x8cf6a4",
+      "find_sample_group": "0xb45d68",
+      "create_sample_group": "0x3cf7d0",
+      "destroy_sample_group": "0xb47294",
+      "remove_sound_instance": "0x8bc7b0",
+      "destroy_sound_instance": "0xb47360",
+      "clear_sound_event": "0x3dc328",
+      "decode_bitmap": "0x3cfc68",
+      "upload_bitmap": "0xb3c464",
+      "opendir": "0x3b57e4",
+      "readdir": "0x3b57f0",
+      "closedir": "0x3b6330",
+      "strlen": "0x3abdd0",
+      "strncmp": "0x3c24a4",
+      "strncasecmp": "0x3daab0",
+      "strcmp": "0x3c36ec",
+      "strcasecmp": "0x3cb288",
+      "memcmp": "0x3acb08",
+      "__aeabi_uidiv": "0x3c19e8",
+      "__aeabi_uidivmod": "0x3abcb0",
+      "create_ui_texture": "0x6915f8",
+      "build_ui_texture": "0x691830",
+      "make_atlas_drawable": "0x3ac280",
+      "make_texture_drawable": "0x724474",
+      "get_object_template": "0x3ad558",
+      "get_callout_template": "0x3b1d7c",
+      "copy_game_string": "0x3ac658",
+      "directory_child": "0x3c11a8",
+      "directory_number": "0x3d376c",
+      "read_sprite_definition": "0x3d4d38",
+      "directory_data": "0x3c1418",
+      "get_mod_sprite_offset": "0x3d4d44",
+      "add_user_defined_sprite": "0x3d4cfc",
+      "language_has_phrase": "0x3b1ee4",
+      "language_lookup": "0x3ac058",
+      "load_production_rules": "0x3d6490",
+      "append_production_rule": "0x3d64b4",
+      "append_processor_rule": "0x3d64a8",
+      "load_events": "0x3d3a90",
+      "append_event": "0x3d3a9c",
+      "destroy_event": "0x3d3a78",
+      "initialise_event": "0x97b854",
+      "append_job": "0x3d7ff0",
+      "append_prefab": "0x3d2248",
+      "initialise_prefab": "0x9449f0",
+      "draw_texture_box": "0x3ba53c",
+      "draw_sprite_bank_box": "0x68f604",
+      "get_app_save_folder": "0x3b02ac",
+      "append_game_string": "0x3abddc",
+      "assign_game_string": "0x3df898",
+      "concat_game_string": "0x3adf0c",
+      "disk_file_exists": "0x3b02f4",
+      "split_game_string": "0x3cb4a4",
+      "fopen": "0x3b2364",
+      "fread": "0x3b2634",
+      "fclose": "0x3b2388",
+      "set_supported_locales": "0x3c8b7c",
+      "append_locale_pair": "0x3b6798",
+      "append_language_label": "0x3b0624",
+      "register_static_destructor": "0x3abbc0",
+      "make_image_texture": "0x3c1478",
+      "gl_bind_texture": "0x3cfd88",
+      "gl_generate_mipmap": "0x3db488",
+      "construct_sprite_bank": "0x8cac14",
+      "destroy_sprite_bank": "0x8cad4c",
+      "load_sprite_bank_path": "0x8cc5e4",
+      "lookup_object_id": "0x3c94dc",
+      "lookup_zone_id": "0x9cd8a8",
+      "entity_ctor": "0x3d9538",
+      "worker_ctor": "0x3d91c0",
+      "gets_tired": "0x3d33e8"
+    },
+    "NATIVE_PREVIEW_HOOKS": [
+      [
+        "0x4d4620",
+        "0x3ac280",
+        "make_object_preview_hook"
+      ],
+      [
+        "0x7239f0",
+        "0x3ba53c",
+        "draw_preview_hook"
+      ]
+    ],
+    "MOD_SELECTION_HOOK": "0x7b0044",
+    "MOD_FILE_PATH_HOOKS": [
+      "0x7b31dc",
+      "0x7b3218"
+    ],
+    "MATERIAL_SPRITE_HOOKS": [
+      "0x9c8b80",
+      "0x9c9078"
+    ],
+    "SPRITE_ROOT_COMPARE_HOOKS": [
+      [
+        "0x8d3dcc",
+        "0xe1520001",
+        "compare_atlas_root"
+      ],
+      [
+        "0x8d45b8",
+        "0xe1560007",
+        "compare_materials_root"
+      ]
+    ],
+    "CALLOUT_ICON_HOOK": "0x9ca2c4",
+    "TOOLBAR_ICON_HOOK": "0x9c8e74",
+    "CALLOUT_LABEL_HOOK": "0x4d32f8",
+    "SQUAD_ICON_NAME_HOOK": "0x4b93b4",
+    "SQUAD_DRAWABLE_HOOK": "0x4b9568",
+    "PRODUCTION_PATHS_HOOK": "0xa3006c",
+    "PRODUCTION_LOAD_HOOK": "0xa300a4",
+    "PRODUCTION_RULE_HOOK": "0xa3075c",
+    "PROCESSOR_RULE_HOOK": "0xa30720",
+    "REFORM_PROGRAM_PATHS_HOOK": "0xa35e58",
+    "RESEARCH_PATHS_HOOK": "0xa44d30",
+    "FEMALE_NEEDS_PATHS_HOOK": "0x9ed14c",
+    "NEEDS_PATHS_HOOK": "0x9ed1d0",
+    "NEEDS_MISSING_FILE_BRANCH": "0x9ed9b8",
+    "RESEARCH_DUPLICATE_BRANCH": "0xa467e8",
+    "EVENTS_LOAD_HOOK": "0x984870",
+    "EVENT_ENTRY_HOOK": "0x984b5c",
+    "JOB_PATHS_HOOK": "0xaac890",
+    "JOB_ENTRY_HOOK": "0xaaccbc",
+    "PREFAB_PATHS_HOOK": "0x930fd0",
+    "PREFAB_ENTRY_HOOK": "0x931148",
+    "SOUND_SAMPLE_HOOK": "0xb503b4",
+    "READER_EXTENSION_HOOKS": [
+      "0xb12198",
+      "0xb124a8"
+    ],
+    "SOUND_EXTENSION_COMPARE_HOOKS": [
+      "0xb51004",
+      "0xb5101c"
+    ],
+    "SOUND_PATHS_HOOKS": [
+      "0x74b148",
+      "0x7acc04"
+    ],
+    "SOUND_EVENT_HOOK": "0xb442d8",
+    "SOUND_GROUP_HOOK": "0xb44164",
+    "SCRIPT_READER_HOOKS": [
+      "0x916358",
+      "0x9166cc"
+    ],
+    "CAMPAIGN_MAP_READER_HOOKS": [
+      "0x7472a0",
+      "0x747ed0"
+    ],
+    "BIOGRAPHY_READER_HOOK": "0x91fc18",
+    "PRISONER_RECORDS_READER_HOOK": "0x92000c",
+    "DSP_EFFECTS_READER_HOOK": "0xb439a0",
+    "DIALOG_READER_HOOK": "0xaf5830",
+    "VERTEX_SHADER_READER_HOOK": "0xb3319c",
+    "FRAGMENT_SHADER_READER_HOOK": "0xb332e8",
+    "MOD_FONT_LOAD_HOOK": "0x78a0c0",
+    "MOD_FONT_BMP_PASS": "0x78a0d0",
+    "BASE_FONT_LOAD": "0x78a0e4",
+    "IMAGE_READER_HOOK": "0xb41d10",
+    "GALLERY_IMAGE_HOOK": "0x525658",
+    "MENU_ATLAS_HOOK": "0xb41dd0",
+    "TRACK_TITLE_HOOK": "0xb42d28",
+    "MOD_LANGUAGE_HOOK": "0x743770",
+    "SUPPORTED_LOCALES_HOOK": "0x74194c",
+    "LANGUAGE_LABELS_HOOK": "0x40b7f4",
+    "LANGUAGE_DUPLICATE_BRANCH": "0xaf2740",
+    "LOAD_LANGUAGE_STRUCTURE": "0x3c8e10",
+    "SCRIPT_LIST_HOOK": "0x91602c",
+    "CAVE": "0xeabf08",
+    "CAVE_LIMIT": "0xeacab0",
+    "BANK_CODE": "0xf7c000",
+    "SEGMENT_ALIGNMENT": "0x4000",
+    "BANK_BASELINE": "0xf7a6f8",
+    "BANK_BASELINE_SIZE": "0x8",
+    "NATIVE_ATLAS_STATE": "0xf7a700",
+    "NATIVE_ATLAS_STATE_SIZE": "0x8",
+    "PREVIEW_TEXTURE": "0xf7a708",
+    "CALLOUT_ICONS": "0xf7a70c",
+    "PRODUCTION_OVERLAY": "0xf7a710",
+    "LANGUAGE_OVERLAY": "0xf7a711",
+    "EVENT_OVERLAY": "0xf7a712",
+    "MENU_TITLE_IMAGE": "0xf7a714",
+    "MATERIAL_DUPLICATE_BRANCHES": [
+      [
+        "0x9c8e4c",
+        "0x1a000025",
+        "check_duplicate_object"
+      ],
+      [
+        "0x9c912c",
+        "0x1a00001d",
+        "check_duplicate_equipment"
+      ],
+      [
+        "0x9c9390",
+        "0x1a00006b",
+        "check_duplicate_material"
+      ],
+      [
+        "0x9c97e4",
+        "0x1a00024f",
+        "check_duplicate_room"
+      ],
+      [
+        "0x9ca29c",
+        "0x1a000011",
+        "check_duplicate_callout"
+      ]
+    ],
+    "NATIVE_CRASH_TRACE_HOOK": "0x7af8ec",
+    "NATIVE_CRASH_TRACE_IMPORTS": {
+      "app_constructor": "0x3cb408",
+      "set_signal_action": "0x3e0120",
+      "android_log_print": "0x3b3594",
+      "exit_process": "0x3daf54"
+    },
+    "DEFAULT_STAFF_STATE": "0xf7a718",
+    "DEFAULT_STAFF_STATE_SIZE": "0x4",
+    "DEFAULT_STAFF_FACTORY_HOOK": "0xadbb90",
+    "DEFAULT_STAFF_HANGOUT_HOOKS": [
+      "0xaa9144",
+      "0xaa91cc"
+    ],
+    "DEFAULT_STAFF_TIRED_HOOK": "0x96c144",
+    "DEFAULT_STAFF_HANGOUT_UPDATE_HOOK": "0xaa9bbc"
+  },
+  "linkSymbols": {
+    "read_materials": "0x3d4cf0",
+    "fast_list_insert": "0x3c92c0",
+    "atlas_root_continue": "0x8d3dd0",
+    "materials_root_continue": "0x8d45bc",
+    "load_sprite_bank": "0x3ca3e8",
+    "load_sprite_image": "0x3c91e8",
+    "archive_file_exists": "0x3c13e8",
+    "truncate_sprite_bank": "0x3d4ce4",
+    "initialise_renderer": "0x3c8b34",
+    "read_mod_types": "0x7b286c",
+    "initialise_mods": "0x3ccb18",
+    "bank_baseline": "0xf7a6f8",
+    "native_atlas_state": "0xf7a700",
+    "preview_texture": "0xf7a708",
+    "callout_icons": "0xf7a70c",
+    "production_overlay": "0xf7a710",
+    "language_overlay": "0xf7a711",
+    "event_overlay": "0xf7a712",
+    "menu_title_image": "0xf7a714",
+    "texture_region_got": "0xed43f8",
+    "read_language_value": "0xaf2744",
+    "skip_language_value": "0xaf2a50",
+    "load_user_sprite_images": "0x8d34b8",
+    "list_sprite_paths": "0x8d3538",
+    "add_valid_sprite": "0x8d36d4",
+    "close_sprite_reader": "0x8d3760",
+    "clear_old_sprite_offsets": "0x8d3b7c",
+    "erase_sprite_offset_tree": "0x3cfc50",
+    "free_sprite_inputs": "0x8d3f38",
+    "delete_object": "0x3abbd8",
+    "new_object": "0x3abbfc",
+    "new_array": "0x3adbc4",
+    "copy_bytes": "0x3abc08",
+    "zero_bytes": "0x3ac550",
+    "debug_log": "0x3b2484",
+    "gl_get_integer": "0x3c8888",
+    "bitmap_destroy": "0x3cc9bc",
+    "append_rectangle": "0x3ce4b0",
+    "store_portrait_pixel": "0x91f73c",
+    "store_image_pixel": "0xb42448",
+    "get_mod_file_paths": "0x3c9224",
+    "load_language_table": "0x3c92cc",
+    "move_bytes": "0x3b06f0",
+    "delete_array": "0x3adb4c",
+    "apply_object_definition": "0x9c8e50",
+    "skip_object_definition": "0x9c8ee8",
+    "apply_equipment_definition": "0x9c9130",
+    "skip_equipment_definition": "0x9c91a8",
+    "apply_material_definition": "0x9c9394",
+    "skip_material_definition": "0x9c9544",
+    "apply_room_definition": "0x9c97e8",
+    "skip_room_definition": "0x9ca128",
+    "apply_callout_definition": "0x9ca2a0",
+    "skip_callout_definition": "0x9ca2e8",
+    "set_drawable_id": "0x3ac448",
+    "app_constructor": "0x3cb408",
+    "set_signal_action": "0x3e0120",
+    "android_log_print": "0x3b3594",
+    "exit_process": "0x3daf54",
+    "lookup_sprite": "0x8cbdd4",
+    "sprite_rect": "0x8cb358",
+    "get_binary_reader": "0x3c16c4",
+    "get_text_reader": "0x3b4d70",
+    "load_bitmap_font": "0x3ca1b4",
+    "list_archive": "0x3c16b8",
+    "list_directory": "0x3c9128",
+    "destroy_file_paths": "0x8cf6a4",
+    "find_sample_group": "0xb45d68",
+    "create_sample_group": "0x3cf7d0",
+    "destroy_sample_group": "0xb47294",
+    "remove_sound_instance": "0x8bc7b0",
+    "destroy_sound_instance": "0xb47360",
+    "clear_sound_event": "0x3dc328",
+    "decode_bitmap": "0x3cfc68",
+    "upload_bitmap": "0xb3c464",
+    "opendir": "0x3b57e4",
+    "readdir": "0x3b57f0",
+    "closedir": "0x3b6330",
+    "strlen": "0x3abdd0",
+    "strncmp": "0x3c24a4",
+    "strncasecmp": "0x3daab0",
+    "strcmp": "0x3c36ec",
+    "strcasecmp": "0x3cb288",
+    "memcmp": "0x3acb08",
+    "__aeabi_uidiv": "0x3c19e8",
+    "__aeabi_uidivmod": "0x3abcb0",
+    "create_ui_texture": "0x6915f8",
+    "build_ui_texture": "0x691830",
+    "make_atlas_drawable": "0x3ac280",
+    "make_texture_drawable": "0x724474",
+    "get_object_template": "0x3ad558",
+    "get_callout_template": "0x3b1d7c",
+    "copy_game_string": "0x3ac658",
+    "directory_child": "0x3c11a8",
+    "directory_number": "0x3d376c",
+    "read_sprite_definition": "0x3d4d38",
+    "directory_data": "0x3c1418",
+    "get_mod_sprite_offset": "0x3d4d44",
+    "add_user_defined_sprite": "0x3d4cfc",
+    "language_has_phrase": "0x3b1ee4",
+    "language_lookup": "0x3ac058",
+    "load_production_rules": "0x3d6490",
+    "append_production_rule": "0x3d64b4",
+    "append_processor_rule": "0x3d64a8",
+    "load_events": "0x3d3a90",
+    "append_event": "0x3d3a9c",
+    "destroy_event": "0x3d3a78",
+    "initialise_event": "0x97b854",
+    "append_job": "0x3d7ff0",
+    "append_prefab": "0x3d2248",
+    "initialise_prefab": "0x9449f0",
+    "draw_texture_box": "0x3ba53c",
+    "draw_sprite_bank_box": "0x68f604",
+    "get_app_save_folder": "0x3b02ac",
+    "append_game_string": "0x3abddc",
+    "assign_game_string": "0x3df898",
+    "concat_game_string": "0x3adf0c",
+    "disk_file_exists": "0x3b02f4",
+    "split_game_string": "0x3cb4a4",
+    "fopen": "0x3b2364",
+    "fread": "0x3b2634",
+    "fclose": "0x3b2388",
+    "set_supported_locales": "0x3c8b7c",
+    "append_locale_pair": "0x3b6798",
+    "append_language_label": "0x3b0624",
+    "register_static_destructor": "0x3abbc0",
+    "make_image_texture": "0x3c1478",
+    "gl_bind_texture": "0x3cfd88",
+    "gl_generate_mipmap": "0x3db488",
+    "construct_sprite_bank": "0x8cac14",
+    "destroy_sprite_bank": "0x8cad4c",
+    "load_sprite_bank_path": "0x8cc5e4",
+    "app_got": "0xed0200",
+    "names_got": "0xed3188",
+    "interface_names_got": "0xed3180",
+    "filesystem_got": "0xed0d4c",
+    "stock_squad_icons": "0xeeb24c",
+    "language_table_got": "0xed0218",
+    "load_language_structure": "0x3c8e10",
+    "squad_icon_continue": "0x4b93c0",
+    "squad_icon_ready": "0x4b9454",
+    "lookup_object_id": "0x3c94dc",
+    "lookup_zone_id": "0x9cd8a8",
+    "entity_ctor": "0x3d9538",
+    "worker_ctor": "0x3d91c0",
+    "gets_tired": "0x3d33e8",
+    "default_staff_state": "0xf7a718"
+  },
+  "patches": [
+    {
+      "address": "0x40b7f4",
+      "expected": "0xebfe80f1",
+      "target": "register_language_labels",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x4b93b4",
+      "expected": "0xe0810081",
+      "target": "squad_icon_name_hook",
+      "link": false,
+      "condition": 14
+    },
+    {
+      "address": "0x4b9568",
+      "expected": "0xebfbcb44",
+      "target": "make_squad_preview_hook",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x4d32f8",
+      "expected": "0xebfb6356",
+      "target": "lookup_callout_label",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x4d4620",
+      "expected": "0xebfb5f16",
+      "target": "make_object_preview_hook",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x525658",
+      "expected": "0xebfa3341",
+      "target": "open_gallery_image",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x6a9dd0",
+      "expected": "0xe2801014",
+      "target": "set_grant_icon",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x6a9dd4",
+      "expected": "0xe24b00bc",
+      "value": "0xe1a00000"
+    },
+    {
+      "address": "0x6a9dd8",
+      "expected": "0xebf4099a",
+      "value": "0xe1a00000"
+    },
+    {
+      "address": "0x7239f0",
+      "expected": "0xebf25ad1",
+      "target": "draw_preview_hook",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x7418fc",
+      "expected": "0xebf21c8c",
+      "target": "scan_mods_before_renderer",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x74194c",
+      "expected": "0xebf21c8a",
+      "target": "set_supported_locales_with_chinese",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x743770",
+      "expected": "0xebf215a6",
+      "target": "finish_language_reset",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x7472a0",
+      "expected": "0xebf1b6b2",
+      "target": "open_campaign_text_reader",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x747ed0",
+      "expected": "0xebf1b3a6",
+      "target": "open_campaign_text_reader",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x74b148",
+      "expected": "0xebf1f835",
+      "target": "base_file_first",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x74b624",
+      "expected": "0xebf1f728",
+      "target": "load_mod_language",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x78a0c0",
+      "expected": "0xeb00004b",
+      "target": "load_mod_fonts_hook",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x78a0d0",
+      "expected": "0xe28d100c",
+      "target": "0x78a0e4",
+      "link": false,
+      "condition": 14
+    },
+    {
+      "address": "0x7acc04",
+      "expected": "0xebf07186",
+      "target": "base_file_first",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x7b0044",
+      "expected": "0xebf06d16",
+      "target": "split_mod_preferences",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x7b31dc",
+      "expected": "0xebefeb4a",
+      "target": "join_mod_file_path",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x7b3218",
+      "expected": "0xebefeb3b",
+      "target": "join_mod_file_path",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x8d26a4",
+      "expected": "0xe5978004",
+      "target": "load_native_atlas",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x8d2764",
+      "expected": "0xebebda9f",
+      "target": "load_composite_image",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x8d279c",
+      "expected": "0xebebdf11",
+      "target": "load_object_bank",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x8d34e0",
+      "expected": "0xe3a00018",
+      "target": "defer_atlas_allocation",
+      "link": false,
+      "condition": 14
+    },
+    {
+      "address": "0x8d35b0",
+      "expected": "0xe3a03001",
+      "value": "0xe3a03000"
+    },
+    {
+      "address": "0x8d36d0",
+      "expected": "0xe58da0a0",
+      "target": "check_decoded_sprite",
+      "link": false,
+      "condition": 14
+    },
+    {
+      "address": "0x8d38c4",
+      "expected": "0xebebf0ff",
+      "target": "reserve_native_atlas_space",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x8d390c",
+      "expected": "0xe1a0508a",
+      "target": "native_atlas_pack_failed",
+      "link": false,
+      "condition": 14
+    },
+    {
+      "address": "0x8d3b78",
+      "expected": "0xe59d0034",
+      "target": "allocate_packed_atlas",
+      "link": false,
+      "condition": 14
+    },
+    {
+      "address": "0x8d3cd4",
+      "expected": "0xebebefe9",
+      "target": "copy_sprite_rgba4444",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x8d3dcc",
+      "expected": "0xe1520001",
+      "target": "compare_atlas_root",
+      "link": false,
+      "condition": 14
+    },
+    {
+      "address": "0x8d45b8",
+      "expected": "0xe1560007",
+      "target": "compare_materials_root",
+      "link": false,
+      "condition": 14
+    },
+    {
+      "address": "0x91602c",
+      "expected": "0xebeaada1",
+      "target": "list_campaign_scripts",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x916358",
+      "expected": "0xebea7a84",
+      "target": "open_campaign_text_reader",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x9166cc",
+      "expected": "0xebea79a7",
+      "target": "open_campaign_text_reader",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x91f730",
+      "expected": "0xe5950014",
+      "target": "read_portrait_pixel",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x91fc18",
+      "expected": "0xebea5454",
+      "target": "open_mod_text",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x92000c",
+      "expected": "0xebea5357",
+      "target": "open_mod_text",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x930fd0",
+      "expected": "0xebea6093",
+      "target": "list_prefab_files",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x931148",
+      "expected": "0xebea843e",
+      "target": "merge_prefab_hook",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x984870",
+      "expected": "0xebe93c86",
+      "target": "load_event_layers",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x984b5c",
+      "expected": "0xebe93bce",
+      "target": "merge_event_hook",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x9c77d4",
+      "expected": "0xeae83542",
+      "target": "reset_object_bank",
+      "link": false,
+      "condition": 14
+    },
+    {
+      "address": "0x9c78ec",
+      "expected": "0xebe834ff",
+      "target": "register_object_sprites",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x9c83d4",
+      "expected": "0xebe80392",
+      "target": "base_materials_first",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x9c8b80",
+      "expected": "0xebe8305d",
+      "target": "register_material_sprite",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x9c8e4c",
+      "expected": "0x1a000025",
+      "target": "check_duplicate_object",
+      "link": false,
+      "condition": 1
+    },
+    {
+      "address": "0x9c8e74",
+      "expected": "0xebe78df7",
+      "target": "read_toolbar_icon_hook",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x9c9078",
+      "expected": "0xebe82f1f",
+      "target": "register_material_sprite",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x9c912c",
+      "expected": "0x1a00001d",
+      "target": "check_duplicate_equipment",
+      "link": false,
+      "condition": 1
+    },
+    {
+      "address": "0x9c9390",
+      "expected": "0x1a00006b",
+      "target": "check_duplicate_material",
+      "link": false,
+      "condition": 1
+    },
+    {
+      "address": "0x9c97e4",
+      "expected": "0x1a00024f",
+      "target": "check_duplicate_room",
+      "link": false,
+      "condition": 1
+    },
+    {
+      "address": "0x9ca29c",
+      "expected": "0x1a000011",
+      "target": "check_duplicate_callout",
+      "link": false,
+      "condition": 1
+    },
+    {
+      "address": "0x9ca2c4",
+      "expected": "0xebe788e3",
+      "target": "read_callout_icon_hook",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x9ed14c",
+      "expected": "0xebe77034",
+      "target": "add_base_needs_file",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x9ed1d0",
+      "expected": "0xebe77013",
+      "target": "list_needs_files",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x9ed9b8",
+      "expected": "0x1a000056",
+      "value": "0xe1a00000"
+    },
+    {
+      "address": "0xa3006c",
+      "expected": "0xebe6646c",
+      "target": "list_production_files",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xa300a4",
+      "expected": "0xebe698f9",
+      "target": "load_production_layer",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xa30720",
+      "expected": "0xebe69760",
+      "target": "merge_processor_rule",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xa3075c",
+      "expected": "0xebe69754",
+      "target": "merge_production_rule",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xa35e58",
+      "expected": "0xebe64cf1",
+      "target": "base_file_first",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xa44d30",
+      "expected": "0xebe6113b",
+      "target": "base_file_first",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xa467e8",
+      "expected": "0x1a00002e",
+      "value": "0xe1a00000"
+    },
+    {
+      "address": "0xaac890",
+      "expected": "0xebe47263",
+      "target": "base_file_first",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xaaccbc",
+      "expected": "0xebe4accb",
+      "target": "merge_job",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xad7b9c",
+      "expected": "0xebe361d4",
+      "target": "object_script_exists",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xaf2740",
+      "expected": "0x1a0000c2",
+      "target": "check_duplicate_language_key",
+      "link": false,
+      "condition": 1
+    },
+    {
+      "address": "0xaf5830",
+      "expected": "0xebe2fd4e",
+      "target": "open_mod_text",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xb12198",
+      "expected": "0xebe28932",
+      "target": "find_file_extension",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xb124a8",
+      "expected": "0xebe2886e",
+      "target": "find_file_extension",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xb3319c",
+      "expected": "0xebe206f3",
+      "target": "open_mod_text",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xb332e8",
+      "expected": "0xebe206a0",
+      "target": "open_mod_text",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xb41d10",
+      "expected": "0xebe1fe6b",
+      "target": "open_mod_image",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xb41dd0",
+      "expected": "0xebe237a4",
+      "target": "decode_mod_atlas_hook",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xb4243c",
+      "expected": "0xe5940014",
+      "target": "read_image_pixel",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xb42d28",
+      "expected": "0xebe1f9d2",
+      "target": "track_menu_title",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xb439a0",
+      "expected": "0xebe1c4f2",
+      "target": "open_mod_text",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xb44164",
+      "expected": "0xebe22d99",
+      "target": "replace_sample_group",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xb442d8",
+      "expected": "0xebe26012",
+      "target": "merge_sound_event_hook",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xb503b4",
+      "expected": "0xebe1c4c2",
+      "target": "open_sound_sample",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xb51004",
+      "expected": "0xebe1c52c",
+      "target": "compare_sound_file_type",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xb5101c",
+      "expected": "0xebe1c526",
+      "target": "compare_sound_file_type",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xadbb90",
+      "expected": "0xe3a00e1d",
+      "target": "construct_default_staff_hook",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xadbb98",
+      "expected": "0xe1a05000",
+      "target": "0xadbbb8",
+      "link": false,
+      "condition": 14
+    },
+    {
+      "address": "0xaa9144",
+      "expected": "0xe58451d8",
+      "target": "set_default_staff_hangout_hook",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xaa91cc",
+      "expected": "0xe58451d8",
+      "target": "set_default_staff_hangout_hook",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x96c144",
+      "expected": "0xebe99ca7",
+      "target": "default_staff_gets_tired",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0xadbb94",
+      "expected": "0xebe34018",
+      "value": "0xe1a05000"
+    },
+    {
+      "address": "0xaa9bbc",
+      "expected": "0xe58461d8",
+      "target": "update_default_staff_hangout_hook",
+      "link": true,
+      "condition": 14
+    }
+  ],
+  "offlinePatches": [
+    {
+      "address": "0x4a87a8",
+      "expected": "0xe5d00051",
+      "value": "0xe3a00000"
+    },
+    {
+      "address": "0x4a87b0",
+      "expected": "0xe92d4ff0",
+      "value": "0xe12fff1e"
+    },
+    {
+      "address": "0x4a8ddc",
+      "expected": "0xe92d48f0",
+      "value": "0xe12fff1e"
+    },
+    {
+      "address": "0x4ac570",
+      "expected": "0xe92d4c10",
+      "value": "0xe3a00001"
+    },
+    {
+      "address": "0x4ac574",
+      "expected": "0xe28db008",
+      "value": "0xe12fff1e"
+    },
+    {
+      "address": "0x4ac5e0",
+      "expected": "0xe92d4ff0",
+      "value": "0xe2411001"
+    },
+    {
+      "address": "0x4ac5e4",
+      "expected": "0xe28db01c",
+      "value": "0xe3510004"
+    },
+    {
+      "address": "0x4ac5e8",
+      "expected": "0xe24dd074",
+      "value": "0x93a00001"
+    },
+    {
+      "address": "0x4ac5ec",
+      "expected": "0xe1a08000",
+      "value": "0x83a00000"
+    },
+    {
+      "address": "0x4ac5f0",
+      "expected": "0xe59f086c",
+      "value": "0xe12fff1e"
+    },
+    {
+      "address": "0x4ace80",
+      "expected": "0xe92d4ff0",
+      "value": "0xe3a00001"
+    },
+    {
+      "address": "0x4ace84",
+      "expected": "0xe28db01c",
+      "value": "0xe12fff1e"
+    },
+    {
+      "address": "0x4ae1a0",
+      "expected": "0xe92d4ff0",
+      "value": "0xe3a00001"
+    },
+    {
+      "address": "0x4ae1a4",
+      "expected": "0xe28db01c",
+      "value": "0xe12fff1e"
+    }
+  ],
+  "stockDexSha256": "eca4b0ee0970434628d37bce5e9aed54884c8b045934f0e576fd5d73b9f6ef17"
+}

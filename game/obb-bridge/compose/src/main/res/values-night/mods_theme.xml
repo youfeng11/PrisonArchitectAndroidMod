@@ -1,0 +1,8 @@
+<resources>
+    <color name="mods_window_background">#FF141318</color>
+    <style name="Theme.PAToolsMods" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/mods_window_background</item>
+        <item name="android:statusBarColor">@color/mods_window_background</item>
+        <item name="android:navigationBarColor">@color/mods_window_background</item>
+    </style>
+</resources>

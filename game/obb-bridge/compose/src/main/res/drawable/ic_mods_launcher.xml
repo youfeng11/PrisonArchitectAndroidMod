@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The game packager replaces this reference with the original application icon. -->
+    <item android:drawable="@android:color/transparent" />
+    <item
+        android:drawable="@drawable/ic_mods_launcher_badge"
+        android:gravity="bottom|right"
+        android:width="23dp"
+        android:height="23dp" />
+</layer-list>
