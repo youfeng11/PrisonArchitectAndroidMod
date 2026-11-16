@@ -2,14 +2,15 @@ package pa.game
 
 import java.io.ByteArrayOutputStream
 
-internal const val GAME_PACKAGE = "com.paradoxplaza.prisonarchitect"
+internal const val ORIGINAL_GAME_PACKAGE = "com.paradoxplaza.prisonarchitect"
+internal const val GAME_PACKAGE = "$ORIGINAL_GAME_PACKAGE.mod"
 internal const val OBB_ASSET = "assets/patools/main.49.com.paradoxplaza.prisonarchitect.obb"
 internal val GOOGLE_PERMISSIONS = setOf("com.android.vending.CHECK_LICENSE", "com.android.vending.BILLING",
-    "com.google.android.c2dm.permission.RECEIVE", "$GAME_PACKAGE.permission.C2D_MESSAGE")
+    "com.google.android.c2dm.permission.RECEIVE", "$ORIGINAL_GAME_PACKAGE.permission.C2D_MESSAGE")
 internal val GOOGLE_COMPONENTS = setOf("com.google.android.gms.version", "com.google.android.gms.common.api.GoogleApiActivity",
-    "com.adjust.sdk.AdjustReferrerReceiver", "$GAME_PACKAGE.core.GCMBroadcastReceiver", "$GAME_PACKAGE.core.GCMService",
-    "$GAME_PACKAGE.expansion.ApkExpansionDownloadActivity", "$GAME_PACKAGE.expansion.ApkExpansionDownloadService",
-    "$GAME_PACKAGE.expansion.ApkExpansionAlarmReceiver")
+    "com.adjust.sdk.AdjustReferrerReceiver", "$ORIGINAL_GAME_PACKAGE.core.GCMBroadcastReceiver", "$ORIGINAL_GAME_PACKAGE.core.GCMService",
+    "$ORIGINAL_GAME_PACKAGE.expansion.ApkExpansionDownloadActivity", "$ORIGINAL_GAME_PACKAGE.expansion.ApkExpansionDownloadService",
+    "$ORIGINAL_GAME_PACKAGE.expansion.ApkExpansionAlarmReceiver")
 
 internal data class ActivityResources(val theme: Long, val label: Long, val icon: Long)
 private data class Attribute(val key: String, val resource: Long, val type: Int, val value: Long = 0, val text: String? = null)
@@ -81,7 +82,14 @@ internal class ManifestPatcher(bytes: ByteArray) {
         for (entry in data) body.write(element("data", listOf(entry)))
         return element("intent-filter", children = body.toByteArray())
     }
-    fun patch(resources: ActivityResources): ByteArray {
+    private fun replaceText(node: Binary, at: Int, value: String) {
+        require(node.u8(at + 15) == 3) { "Expected a string manifest attribute" }
+        val replacement = index(value).toLong()
+        node.put32(at + 8, replacement)
+        node.put32(at + 16, replacement)
+    }
+
+    fun patch(resources: ActivityResources, projectVersion: String): ByteArray {
         val result = ByteArrayOutputStream()
         var skip = 0
         for (chunk in chunks.drop(2)) {
@@ -95,12 +103,9 @@ internal class ManifestPatcher(bytes: ByteArray) {
             if (chunk.type == 0x102 && tag == "manifest") {
                 repeat(node.u16(28)) { i ->
                     val at = 16 + node.u16(24) + i * node.u16(26)
-                    if (names[node.i32(at + 4)] == "versionName") {
-                        require(node.u8(at + 15) == 3) { "Expected a string versionName" }
-                        val original = names[node.i32(at + 16)]
-                        val version = index(if (original.endsWith("-mod")) original else "$original-mod")
-                        node.put32(at + 8, version.toLong())
-                        node.put32(at + 16, version.toLong())
+                    when (names[node.i32(at + 4)]) {
+                        "versionName" -> replaceText(node, at, "${names[node.i32(at + 16)]}-$projectVersion")
+                        "package" -> replaceText(node, at, GAME_PACKAGE)
                     }
                 }
             }
@@ -120,9 +125,12 @@ internal class ManifestPatcher(bytes: ByteArray) {
                     Attribute("protectionLevel", 0x01010009, 0x11, 2))))
             }
             if (chunk.type == 0x103 && tag == "application") {
-                result.write(element("meta-data", listOf(text("name", 0x01010003, "$GAME_PACKAGE.patools.COMPOSITE_RESIZE"),
+                // The stock core.R helper reflects R classes using this value.
+                result.write(element("meta-data", listOf(text("name", 0x01010003, "packageName"),
+                    text("value", 0x01010024, ORIGINAL_GAME_PACKAGE))))
+                result.write(element("meta-data", listOf(text("name", 0x01010003, "$ORIGINAL_GAME_PACKAGE.patools.COMPOSITE_RESIZE"),
                     Attribute("value", 0x01010024, 0x12, -1))))
-                result.write(element("service", listOf(text("name", 0x01010003, "$GAME_PACKAGE.patools.ObbBridgeService"),
+                result.write(element("service", listOf(text("name", 0x01010003, "$ORIGINAL_GAME_PACKAGE.patools.ObbBridgeService"),
                     text("permission", 0x01010006, "$GAME_PACKAGE.permission.PATOOLS_OBB"),
                     Attribute("exported", 0x01010010, 0x12, -1), text("process", 0x01010011, ":patools_obb"))))
                 val mimeTypes = listOf("application/zip", "application/x-zip-compressed", "application/vnd.rar",
@@ -139,7 +147,7 @@ internal class ManifestPatcher(bytes: ByteArray) {
                     defaultCategory, element("data", listOf(text("scheme", 0x01010027, "content"))), archiveTypes))
                 result.write(element("activity", listOf(Attribute("theme", 0x01010000, 1, resources.theme),
                     Attribute("label", 0x01010001, 1, resources.label), Attribute("icon", 0x01010002, 1, resources.icon),
-                    text("name", 0x01010003, "$GAME_PACKAGE.patools.NativeModsActivity"),
+                    text("name", 0x01010003, "$ORIGINAL_GAME_PACKAGE.patools.NativeModsActivity"),
                     Attribute("exported", 0x01010010, 0x12, -1), text("process", 0x01010011, ":patools_mods"),
                     text("taskAffinity", 0x01010012, "$GAME_PACKAGE.patools.mods"), Attribute("launchMode", 0x0101001d, 0x10, 2)),
                     concatenate(launcher, view)))

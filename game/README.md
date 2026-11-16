@@ -1,6 +1,6 @@
 # v49 游戏补丁开发说明
 
-在项目根目录打开 Gradle 工程。构建目标为 Android 2.0.9（49）的 ARMv7，包名为 `com.paradoxplaza.prisonarchitect`。
+在项目根目录打开 Gradle 工程。构建目标为 Android 2.0.9（49）的 ARMv7，输出包名为 `com.paradoxplaza.prisonarchitect.mod`。Java 和 JNI 类名继续使用原有命名空间；Manifest 的 `packageName` 元数据让原引擎的资源反射继续查找原有 `R` 类。
 
 ## 源码导航
 
@@ -50,7 +50,9 @@ SDK 同时需要供 Android 子工程发现，使用 `ANDROID_HOME` 或根目录
 
 所有构建固定输出到 `build/PrisonArchitect.apk`。构建器在临时目录完成修改、对齐、签名和检查，成功后原子替换产物。失败工具日志保存在 `build/diagnostics/tool-failures/`。
 
-构建时在原 APK 的版本名后追加 `-mod`，例如 `2.0.9-mod`；版本代码保持 49。
+项目版本统一定义在根目录 `gradle.properties` 的 `version`。构建时在原 APK 的版本名后追加该项目版本，目前为 `2.0.9-0.1.0`；版本代码保持 49。
+
+新包名使用独立的存档和模组目录。内置 OBB 首次启动时写入 `Android/obb/com.paradoxplaza.prisonarchitect.mod/main.49.com.paradoxplaza.prisonarchitect.mod.obb`；构建输入仍使用原 APK 和原 OBB 文件名。
 
 ## APK 签名
 
@@ -128,3 +130,5 @@ Workshop Laborers（劳动者）是这条路径的回归样本，包含四套外
 构建为游戏增加了签名权限和独立 OBB 服务。PATools 客户端可使用该服务读取、安装和恢复游戏 OBB。游戏构建所需的 AIDL 已包含在 [obb-bridge/aidl](obb-bridge/aidl/)。
 
 客户端与游戏必须使用相同签名才能调用该服务。小米 HyperOS 上若系统阻止绑定服务，可在后台自启动设置里允许监狱建筑师。
+
+服务组件为 `com.paradoxplaza.prisonarchitect.mod/com.paradoxplaza.prisonarchitect.patools.ObbBridgeService`，所需签名权限为 `com.paradoxplaza.prisonarchitect.mod.permission.PATOOLS_OBB`。

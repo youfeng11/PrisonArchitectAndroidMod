@@ -22,6 +22,7 @@ abstract class BuildGameTask : DefaultTask() {
     @get:InputFile abstract val signingProperties: RegularFileProperty
     @get:InputFile abstract val obb: RegularFileProperty
     @get:Input abstract val host: Property<String>
+    @get:Input abstract val projectVersion: Property<String>
     @get:InputFiles abstract val patchSources: ConfigurableFileCollection
     @get:Classpath abstract val smaliClasspath: ConfigurableFileCollection
     @get:OutputFile abstract val output: RegularFileProperty
@@ -36,7 +37,7 @@ abstract class BuildGameTask : DefaultTask() {
             ApkBuilder(tools, V49Profile(profileFile.get().asFile)).build(
                 sourceApk.get().asFile, composeApk.get().asFile, obb.get().asFile,
                 ApkSigning.load(keystore.get().asFile, signingProperties.get().asFile),
-                smaliClasspath.asPath, target, staging)
+                projectVersion.get(), smaliClasspath.asPath, target, staging)
             logger.lifecycle("Built ${target.absolutePath}")
         } finally { staging.deleteRecursively() }
     }
@@ -94,6 +95,7 @@ class GameBuildPlugin : Plugin<Project> {
             keystore.set(keystoreFile)
             signingProperties.set(signingFile)
             host.set(System.getProperty("os.name") + "/" + System.getProperty("java.version"))
+            projectVersion.set(provider { project.version.toString() })
             patchSources.from(fileTree("game") { include("*.c", "*.S", "obb-bridge/*.java", "obb-bridge/aidl/**/*.aidl") })
             obb.set(obbFile)
             val localSmali = providers.gradleProperty("game.smaliDir")
@@ -109,7 +111,7 @@ class GameBuildPlugin : Plugin<Project> {
                 val target = file(gameProperty("checkApk", outputFile.path))
                 require(target.isFile) { "Missing APK $target. Run buildGame first." }
                 GameChecks(root, sdkDir, gameProperty("python", if (System.getProperty("os.name").startsWith("Windows")) "python" else "python3"))
-                    .run(target, obbFile, gameProperty("checks", "full"), logger::lifecycle)
+                    .run(target, obbFile, gameProperty("checks", "full"), project.version.toString(), logger::lifecycle)
             }
         }
         tasks.register("generateNativeRegions") {
@@ -134,7 +136,7 @@ class GameBuildPlugin : Plugin<Project> {
                 require(gamePid.trim().isEmpty()) { "Save and exit the game before installing" }
                 logger.lifecycle(tools.run(prefix + listOf("install", "-r", outputFile.path)))
                 if (gameProperty("launch", "false").toBoolean()) logger.lifecycle(tools.run(prefix +
-                    listOf("shell", "am", "start", "-n", "$GAME_PACKAGE/.core.MainActivity")))
+                    listOf("shell", "am", "start", "-n", "$GAME_PACKAGE/$ORIGINAL_GAME_PACKAGE.core.MainActivity")))
             }
         }
         gradle.projectsEvaluated {

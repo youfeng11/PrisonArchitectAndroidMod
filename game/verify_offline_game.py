@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 from hashlib import file_digest
 from io import BytesIO
 from pathlib import Path
+import re
 from subprocess import check_output
 from zipfile import ZIP_STORED, ZipFile
 
@@ -14,7 +15,7 @@ from unicorn.arm_const import UC_ARM_REG_LR, UC_ARM_REG_PC, UC_ARM_REG_R0, UC_AR
 from patch_profile import LIBRARY
 
 
-def verify(apk, obb, aapt):
+def verify(apk, obb, aapt, project_version):
     asset = "assets/patools/main.49.com.paradoxplaza.prisonarchitect.obb"
     with ZipFile(apk) as archive, obb.open("rb") as source:
         assert archive.getinfo(asset).compress_type == ZIP_STORED
@@ -22,6 +23,17 @@ def verify(apk, obb, aapt):
             assert file_digest(installed, "sha256").digest() == file_digest(source, "sha256").digest()
         elf = ELFFile(BytesIO(archive.read(LIBRARY)))
     manifest = check_output([aapt, "dump", "xmltree", apk, "AndroidManifest.xml"]).decode()
+    badging = check_output([aapt, "dump", "badging", apk]).decode()
+    assert "name='com.paradoxplaza.prisonarchitect.mod'" in badging
+    assert "versionCode='49'" in badging
+    assert f"versionName='2.0.9-{project_version}'" in badging
+    assert 'com.paradoxplaza.prisonarchitect.mod.permission.PATOOLS_OBB' in manifest
+    assert 'com.paradoxplaza.prisonarchitect.permission.PATOOLS_OBB' not in manifest
+    assert 'com.paradoxplaza.prisonarchitect.core.MainActivity' in manifest
+    assert 'com.paradoxplaza.prisonarchitect.patools.NativeModsActivity' in manifest
+    assert 'com.paradoxplaza.prisonarchitect.patools.ObbBridgeService' in manifest
+    assert re.search(r'E: meta-data[^\n]*\n\s+A: android:name[^\n]*="packageName"[^\n]*\n'
+                     r'\s+A: android:value[^\n]*="com\.paradoxplaza\.prisonarchitect"', manifest)
     for name in (
         "com.android.vending.CHECK_LICENSE", "com.android.vending.BILLING",
         "com.google.android.gms", "com.google.android.c2dm", "ApkExpansionDownload",
@@ -51,7 +63,7 @@ def verify(apk, obb, aapt):
         query(0x4AC5E0, chapter, int(1 <= chapter <= 5))
     for address in (0x4A87A8, 0x4A87B0, 0x4A8DDC):
         query(address, 0, 0)
-    print("Embedded OBB, Google manifest entries, campaign, sandbox and disabled purchase entry points verified.")
+    print("Mod package, project version, component classes, signature permission, bundled OBB and startup verified.")
 
 
 if __name__ == "__main__":
@@ -59,5 +71,6 @@ if __name__ == "__main__":
     parser.add_argument("apk", type=Path)
     parser.add_argument("obb", type=Path)
     parser.add_argument("aapt", type=Path)
+    parser.add_argument("--project-version", required=True)
     args = parser.parse_args()
-    verify(args.apk, args.obb, args.aapt)
+    verify(args.apk, args.obb, args.aapt, args.project_version)

@@ -27,7 +27,8 @@ internal class ApkBuilder(private val tools: Toolchain, private val profile: V49
         zip.write(contents)
         zip.closeEntry()
     }
-    fun build(source: File, compose: File, obb: File, signing: ApkSigning, smaliClasspath: String, output: File, staging: File) {
+    fun build(source: File, compose: File, obb: File, signing: ApkSigning, projectVersion: String,
+              smaliClasspath: String, output: File, staging: File) {
         require(source.canonicalFile != output.canonicalFile)
         ZipFile(obb).use { archive ->
             for (name in listOf("data/tablet/composite.csimage", "data/materials.txt", "data/tablet/jsondata/purchases.json"))
@@ -47,7 +48,7 @@ internal class ApkBuilder(private val tools: Toolchain, private val profile: V49
         tools.run(listOf(tools.android("d8", true).path, "--min-api", "28", "--lib", tools.platform.resolve("android.jar").path,
             "--output", dex.path) + classes.walkTopDown().filter { it.extension == "class" }.map { it.path }.toList())
         val composeManifest = tools.run(tools.android("aapt"), "dump", "xmltree", compose, "AndroidManifest.xml")
-        val activity = composeManifest.split("E: activity (").firstOrNull { it.contains("$GAME_PACKAGE.patools.NativeModsActivity") }
+        val activity = composeManifest.split("E: activity (").firstOrNull { it.contains("$ORIGINAL_GAME_PACKAGE.patools.NativeModsActivity") }
             ?: error("Missing mod manager activity")
         val resources = ActivityResources(resourceId(activity, "theme", "80"), resourceId(activity, "label", "80"), resourceId(activity, "icon", "80"))
         val originalManifest = tools.run(tools.android("aapt"), "dump", "xmltree", source, "AndroidManifest.xml")
@@ -73,7 +74,7 @@ internal class ApkBuilder(private val tools: Toolchain, private val profile: V49
                         var value = bytes(stock, name)
                         when (name) {
                             profile.text("LIBRARY") -> value = native
-                            "AndroidManifest.xml" -> value = ManifestPatcher(value).patch(resources)
+                            "AndroidManifest.xml" -> value = ManifestPatcher(value).patch(resources, projectVersion)
                             "classes.dex" -> value = OfflineDex(tools, profile, smaliClasspath).patch(value, staging)
                             "resources.arsc" -> {
                                 value = ResourceTables.merge(value, bytes(manager, name))

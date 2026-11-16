@@ -7,7 +7,7 @@ import java.util.zip.ZipFile
 
 internal class GameChecks(private val root: File, sdk: File, private val python: String) {
     private val tools = Toolchain(root, sdk)
-    fun run(apk: File, obb: File, mode: String, log: (String) -> Unit) {
+    fun run(apk: File, obb: File, mode: String, projectVersion: String, log: (String) -> Unit) {
         require(mode in listOf("smoke", "full"))
         root.resolve("build").mkdirs()
         ZipFile(apk).use { require(it.getEntry(OBB_ASSET) != null) { "APK is missing the bundled OBB" } }
@@ -26,7 +26,8 @@ internal class GameChecks(private val root: File, sdk: File, private val python:
         val scan = mutableListOf(apk.path)
         if (mode == "smoke") scan += "--no-mod-fixtures" else scan += listOf("--obb", obb.path)
         add("Native mod loading", "verify_native_mod_scan.py", *scan.toTypedArray())
-        add("Bundled resources and startup", "verify_offline_game.py", apk.path, obb.path, tools.android("aapt").path)
+        add("Bundled resources and startup", "verify_offline_game.py", apk.path, obb.path, tools.android("aapt").path,
+            "--project-version", projectVersion)
         add("Mod texture color quality", "verify_native_quantization.py", apk.path)
         if (mode == "full") {
             add("Office Chair atlas", "verify_native_mod_atlas.py", apk.path, obb.path, fixtures[0])

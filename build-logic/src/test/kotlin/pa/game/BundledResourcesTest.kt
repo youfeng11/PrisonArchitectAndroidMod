@@ -21,7 +21,7 @@ class BundledResourcesTest {
         }
         val error = assertThrows(IllegalArgumentException::class.java) {
             GameChecks(temporary.root, File(temporary.root, "sdk"), "unused-python")
-                .run(apk, File(temporary.root, "resources.obb"), "smoke") {}
+                .run(apk, File(temporary.root, "resources.obb"), "smoke", "0.1.0") {}
         }
         assertTrue(error.message.orEmpty().contains("bundled OBB"))
     }

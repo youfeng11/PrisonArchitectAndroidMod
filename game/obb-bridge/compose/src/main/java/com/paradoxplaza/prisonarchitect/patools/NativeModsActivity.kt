@@ -87,7 +87,7 @@ class NativeModsActivity : ComponentActivity() {
 
     private fun openGame() {
         val intent = Intent(Intent.ACTION_MAIN)
-            .setClassName(packageName, "$packageName.core.MainActivity")
+            .setClassName(packageName, "com.paradoxplaza.prisonarchitect.core.MainActivity")
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         try {
             startActivity(intent)

@@ -22,8 +22,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.zip.ZipFile;
 
 public final class EmbeddedObb {
-    static final String NAME = "main.49.com.paradoxplaza.prisonarchitect.obb";
-    static final String ASSET = "patools/" + NAME;
+    static final String NAME = "main.49.com.paradoxplaza.prisonarchitect.mod.obb";
+    static final String ASSET = "patools/main.49.com.paradoxplaza.prisonarchitect.obb";
     private static String path;
     private static Activity preparingActivity;
 

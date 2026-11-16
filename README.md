@@ -12,7 +12,7 @@
 ./gradlew.bat buildGame
 ```
 
-Linux 首次使用时运行 `chmod +x gradlew`，之后使用 `./gradlew buildGame`。构建和打包由 Kotlin 完成，生成内置 OBB 的游戏安装包，固定输出到 `build/PrisonArchitect.apk`，版本名为 `2.0.9-mod`。签名读取本地 `signing/signing.properties`。
+Linux 首次使用时运行 `chmod +x gradlew`，之后使用 `./gradlew buildGame`。构建和打包由 Kotlin 完成，生成内置 OBB 的游戏安装包，固定输出到 `build/PrisonArchitect.apk`。包名为 `com.paradoxplaza.prisonarchitect.mod`；项目版本由 `gradle.properties` 的 `version` 定义，目前生成 `2.0.9-0.1.0`。签名读取本地 `signing/signing.properties`。
 
 ## 验证与开发
 

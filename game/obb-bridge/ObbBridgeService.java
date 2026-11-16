@@ -24,7 +24,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.zip.ZipFile;
 
 public final class ObbBridgeService extends Service {
-    private static final String PERMISSION = "com.paradoxplaza.prisonarchitect.permission.PATOOLS_OBB";
     private static final String CLIENT_PACKAGE = "com.youfeng.pa.tools";
     private static final String OBB_NAME = EmbeddedObb.NAME;
     private static final long MAX_BYTES = 1L << 30;
@@ -95,7 +94,7 @@ public final class ObbBridgeService extends Service {
     }
 
     private void enforceClient() {
-        enforceCallingPermission(PERMISSION, "无权调用游戏 OBB 服务。");
+        enforceCallingPermission(getPackageName() + ".permission.PATOOLS_OBB", "无权调用游戏 OBB 服务。");
         try {
             if (getPackageManager().getApplicationInfo(CLIENT_PACKAGE, 0).uid == Binder.getCallingUid()) return;
         } catch (android.content.pm.PackageManager.NameNotFoundException ignored) {
