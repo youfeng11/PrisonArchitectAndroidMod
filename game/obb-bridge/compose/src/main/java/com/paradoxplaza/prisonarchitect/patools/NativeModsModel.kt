@@ -28,6 +28,7 @@ internal class NativeModsModel(private val context: Context) : ViewModel() {
     }
 
     private val store = NativeModStore(context.filesDir.toPath())
+    private var hasResumed = false
     var mods by mutableStateOf<List<NativeModStore.InstalledMod>>(emptyList())
         private set
     var busy by mutableStateOf(false)
@@ -51,13 +52,18 @@ internal class NativeModsModel(private val context: Context) : ViewModel() {
 
     init { reload(showConfirmation = false) }
 
-    fun refresh() {
-        if (busy || pickingArchive || replacement != null) return
-        reload(showConfirmation = true)
+    fun onResume() {
+        if (hasResumed) refresh(showConfirmation = false)
+        hasResumed = true
+    }
+
+    fun refresh(showConfirmation: Boolean = true) {
+        if (busy || pickingArchive || replacement != null || externalArchive != null) return
+        reload(showConfirmation)
     }
 
     private fun reload(showConfirmation: Boolean) = runTask {
-        refreshing = showConfirmation
+        refreshing = loaded
         try {
             mods = withContext(Dispatchers.IO) { store.listByPriority() }
             loaded = true

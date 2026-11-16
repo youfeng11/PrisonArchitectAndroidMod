@@ -83,7 +83,7 @@ internal fun NativeModsRoute(model: NativeModsModel, pickMod: () -> Unit, openGa
             ),
             actions = NativeModsActions(
                 pickMod = pickMod,
-                refresh = model::refresh,
+                refresh = { model.refresh() },
                 enable = model::enable,
                 move = model::move,
                 remove = model::remove,
