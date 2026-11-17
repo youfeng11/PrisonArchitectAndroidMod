@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 from io import BytesIO
 from math import isclose
 import re
+import shlex
 from struct import pack, unpack, unpack_from
 from zipfile import ZipFile
 from zlib import decompress
@@ -41,12 +42,21 @@ FRAME_DIRECTIONS = ((0, 1), (0, -1), (-1, 0), (1, 0))
 
 
 def sprite_records(materials):
-    pattern = r"^[^\S\n]*BEGIN[^\S\n]+(?:Toolbar)?Sprite\s+(.*?)\bEND\b"
-    for match in re.finditer(pattern, materials, re.M | re.S):
-        fields = match[1].split()
-        values = dict(zip(fields[::2], fields[1::2]))
-        if all(key in values for key in ("x", "y", "w", "h")):
-            yield (*(int(values[key]) for key in ("x", "y", "w", "h")), int(values.get("RotateType", 0)))
+    lexer = shlex.shlex(materials, posix=True)
+    lexer.whitespace_split = True
+    lexer.commenters = "#"
+    tokens = iter(lexer)
+    stack = []
+    sprite_kinds = {"Sprite", "ToolbarSprite", "StackSprite"}
+    for token in tokens:
+        if token == "BEGIN":
+            stack.append((next(tokens), {}))
+        elif token == "END":
+            kind, values = stack.pop()
+            if kind in sprite_kinds and all(key in values for key in ("x", "y", "w", "h")):
+                yield (*(int(values[key]) for key in ("x", "y", "w", "h")), int(values.get("RotateType", 0)))
+        elif stack and stack[-1][0] in sprite_kinds:
+            stack[-1][1][token] = next(tokens)
 
 
 def verify(apk, obb, mods):

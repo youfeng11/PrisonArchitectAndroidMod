@@ -11,6 +11,7 @@
 - `super-grants.zip`
 - `log-export-fix.zip`
 - `劳动者mod.zip`（Workshop Laborers，FileID F2129789082）
+- `mods_Manufactury_4_0.zip`（Manufactury 4.0 棉花种植园）
 
 没有这些样本时，可运行 `./gradlew.bat buildGame checkGame "-Pgame.checks=smoke"` 检查构建。
 

@@ -115,6 +115,16 @@ game_world_renderer:
     bx lr
 .Lmaterial_renderer_app: .word app_got - (.Lmaterial_renderer_pc + 8)
 
+.global game_world
+game_world:
+    ldr r0, .Lscript_world_app
+.Lscript_world_pc:
+    ldr r0, [pc, r0]
+    ldr r0, [r0]
+    ldr r0, [r0, #0xe0]
+    bx lr
+.Lscript_world_app: .word app_got - (.Lscript_world_pc + 8)
+
 .global make_object_preview_hook
 make_object_preview_hook:
     ldr r12, [sp, #0x14]        @ MaterialsButton's build mode

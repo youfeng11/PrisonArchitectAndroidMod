@@ -26,6 +26,7 @@ internal class GameChecks(private val root: File, sdk: File, private val python:
         val scan = mutableListOf(apk.path)
         if (mode == "smoke") scan += "--no-mod-fixtures" else scan += listOf("--obb", obb.path)
         add("Native mod loading", "verify_native_mod_scan.py", *scan.toTypedArray())
+        add("Native Lua job API", "verify_native_mod_lua.py", apk.path)
         add("Bundled resources and startup", "verify_offline_game.py", apk.path, obb.path, tools.android("aapt").path,
             "--project-version", projectVersion)
         add("Mod texture color quality", "verify_native_quantization.py", apk.path)
@@ -40,7 +41,11 @@ internal class GameChecks(private val root: File, sdk: File, private val python:
             require(laborer.isFile) { "Missing regression fixture $laborer" }
             add("Custom staff behavior", "verify_native_default_staff.py", apk.path, laborer.path)
             add("Custom staff atlas", "verify_native_mod_atlas.py", apk.path, obb.path, laborer.path)
-            add("Mod storage and imports", "verify_native_mod_store.py", tools.javaHome.path, *fixtures.toTypedArray())
+            val manufactury = root.resolve("fixtures/mods/mods_Manufactury_4_0.zip")
+            require(manufactury.isFile) { "Missing regression fixture $manufactury" }
+            add("Manufactury atlas", "verify_native_mod_atlas.py", apk.path, obb.path, manufactury.path)
+            add("Manufactury research", "verify_native_mod_research.py", apk.path, obb.path, manufactury.path)
+            add("Mod storage and imports", "verify_native_mod_store.py", tools.javaHome.path, *fixtures.toTypedArray(), manufactury.path)
         }
         val executor = Executors.newFixedThreadPool(4)
         try {

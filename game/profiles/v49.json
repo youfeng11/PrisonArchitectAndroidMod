@@ -355,7 +355,39 @@
       "0xaa91cc"
     ],
     "DEFAULT_STAFF_TIRED_HOOK": "0x96c144",
-    "DEFAULT_STAFF_HANGOUT_UPDATE_HOOK": "0xaa9bbc"
+    "DEFAULT_STAFF_HANGOUT_UPDATE_HOOK": "0xaa9bbc",
+    "LUA_OBJECT_REGISTER_HOOK": "0x90f580",
+    "MOD_LUA_IMPORTS": {
+      "lua_tointeger": "0x3ca118",
+      "lua_tolstring": "0x3ca13c",
+      "lua_type": "0x3ca148",
+      "lua_gettop": "0x3d0610",
+      "lua_settop": "0x3d061c",
+      "lua_setfield": "0x3d064c",
+      "lua_pushcclosure": "0x3d0670",
+      "lua_getfield": "0x3d0688",
+      "luaL_register": "0x3d0760",
+      "cancel_work_job": "0x3cb000"
+    },
+    "MOD_RESEARCH_JSON_HOOK": "0x461da0",
+    "MOD_RESEARCH_IMPORTS": {
+      "json_construct": "0xb9c770",
+      "json_construct_text": "0xb9c8fc",
+      "json_construct_int": "0xb9c854",
+      "json_construct_real": "0xb9c8d0",
+      "json_destroy": "0xb9ce54",
+      "json_swap": "0xb9cf7c",
+      "json_member": "0xb9f07c",
+      "json_index": "0xb9ebe0",
+      "json_size": "0xb9e7cc",
+      "json_is_array": "0xb9e8f8",
+      "json_append": "0xb9f5c0",
+      "json_text": "0xb9d480",
+      "json_real": "0xb9e188",
+      "research_item": "0xa44e74",
+      "research_item_count": "0xa44500",
+      "read_research_json_original": "0x3ac79c"
+    }
   },
   "linkSymbols": {
     "read_materials": "0x3d4cf0",
@@ -504,7 +536,33 @@
     "entity_ctor": "0x3d9538",
     "worker_ctor": "0x3d91c0",
     "gets_tired": "0x3d33e8",
-    "default_staff_state": "0xf7a718"
+    "default_staff_state": "0xf7a718",
+    "lua_tointeger": "0x3ca118",
+    "lua_tolstring": "0x3ca13c",
+    "lua_type": "0x3ca148",
+    "lua_gettop": "0x3d0610",
+    "lua_settop": "0x3d061c",
+    "lua_setfield": "0x3d064c",
+    "lua_pushcclosure": "0x3d0670",
+    "lua_getfield": "0x3d0688",
+    "luaL_register": "0x3d0760",
+    "cancel_work_job": "0x3cb000",
+    "json_construct": "0xb9c770",
+    "json_construct_text": "0xb9c8fc",
+    "json_construct_int": "0xb9c854",
+    "json_construct_real": "0xb9c8d0",
+    "json_destroy": "0xb9ce54",
+    "json_swap": "0xb9cf7c",
+    "json_member": "0xb9f07c",
+    "json_index": "0xb9ebe0",
+    "json_size": "0xb9e7cc",
+    "json_is_array": "0xb9e8f8",
+    "json_append": "0xb9f5c0",
+    "json_text": "0xb9d480",
+    "json_real": "0xb9e188",
+    "research_item": "0xa44e74",
+    "research_item_count": "0xa44500",
+    "read_research_json_original": "0x3ac79c"
   },
   "patches": [
     {
@@ -1143,6 +1201,20 @@
       "address": "0xaa9bbc",
       "expected": "0xe58461d8",
       "target": "update_default_staff_hangout_hook",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x90f580",
+      "expected": "0xebeb0476",
+      "target": "register_object_lua",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x461da0",
+      "expected": "0xebfd2a7d",
+      "target": "read_mod_research_json",
       "link": true,
       "condition": 14
     }

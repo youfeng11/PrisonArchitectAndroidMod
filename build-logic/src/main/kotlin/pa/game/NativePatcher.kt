@@ -8,20 +8,25 @@ internal class NativePatcher(private val tools: Toolchain, private val profile: 
         val source = tools.root.resolve("game/register_object_sprites.S")
         val obj = staging.resolve("register.o")
         val replacement = staging.resolve("replacements.o")
+        val lua = staging.resolve("mod_lua.o")
+        val ui = staging.resolve("mod_ui.o")
         val elf = staging.resolve("register.elf")
         val code = staging.resolve("register.bin")
         val bank = staging.resolve("bank.bin")
         tools.run(tools.native("clang"), "--target=armv7a-linux-androideabi", "-DNATIVE_MOD_SCAN",
             "-DNATIVE_MOD_ATLAS", "-DNATIVE_SPRITE_REPLACEMENTS", "-c", source, "-o", obj)
-        tools.run(tools.native("clang"), "--target=armv7a-linux-androideabi21", "-marm", "-Oz", "-fPIC",
-            "-ffreestanding", "-fno-stack-protector", "-fno-unwind-tables", "-fno-asynchronous-unwind-tables",
-            "-Wall", "-Wextra", "-Werror", "-c", source.resolveSibling("native_sprite_replacements.c"), "-o", replacement)
+        for ((name, target) in listOf("native_sprite_replacements.c" to replacement, "native_mod_lua.c" to lua,
+                "native_mod_ui.c" to ui)) {
+            tools.run(tools.native("clang"), "--target=armv7a-linux-androideabi21", "-marm", "-Oz", "-fPIC",
+                "-ffreestanding", "-fno-stack-protector", "-fno-unwind-tables", "-fno-asynchronous-unwind-tables",
+                "-Wall", "-Wextra", "-Werror", "-c", source.resolveSibling(name), "-o", target)
+        }
         val layout = staging.resolve("patch.ld")
         layout.writeText("SECTIONS { .text 0x${profile.address("CAVE").toString(16)} : { *register.o(.text) } " +
-            ".bank_code 0x${profile.address("BANK_CODE").toString(16)} : { *replacements.o(.text .text.* .rodata .rodata.*) } }\n")
+            ".bank_code 0x${profile.address("BANK_CODE").toString(16)} : { *replacements.o(.text .text.* .rodata .rodata.*) *mod_lua.o(.text .text.* .rodata .rodata.*) *mod_ui.o(.text .text.* .rodata .rodata.*) } }\n")
         tools.run(listOf(tools.native("ld.lld").path, "-T", layout.path, "--entry=register_object_sprites") +
             profile.linkSymbols.map { (name, value) -> "--defsym=$name=$value" } +
-            listOf(obj.path, replacement.path, "-o", elf.path))
+            listOf(obj.path, replacement.path, lua.path, ui.path, "-o", elf.path))
         val symbols = tools.run(tools.native("llvm-nm"), "--defined-only", elf).lineSequence()
             .filter { it.isNotBlank() }.associate { line ->
                 val fields = line.trim().split(Regex("\\s+"))

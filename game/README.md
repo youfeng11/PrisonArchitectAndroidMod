@@ -12,6 +12,8 @@
 | 离线 DEX 处理 | `OfflineDex` |
 | 回归编排 | `GameChecks`，调用本目录的 `verify_*.py` |
 | 原生模组行为 | `native_sprite_replacements.c`、`register_object_sprites.S` |
+| Lua 接口兼容 | `native_mod_lua.c` |
+| 手机版模组研究界面 | `native_mod_ui.c` |
 | 版本定义 | `profiles/v49.json`，Python 经 `patch_profile.py` 读取 |
 | Android 文件与模组操作 | `obb-bridge/NativeModStore.java`、`ModArchive.java`、`MaterialDefinitionRepair.java` |
 
@@ -104,6 +106,16 @@ keytool -genkeypair -keystore signing/prisonarchitect.p12 -storetype PKCS12 -ali
 新增对象同时声明 `Properties Entity`、`Properties Staff` 和 `Properties DefaultBehaviour` 时，可使用移动版 Worker 的找工作、执行任务和闲置行为。`HangOutRoom` 按房间名称解析；`StaffNeeds` 接入移动版已有的疲劳和休息逻辑，并不提供桌面版完整的员工需求系统。带 `Properties Scripted` 的对象继续由脚本控制。规则来自模组定义，不依赖具体对象名称或编号；重新加载材料时会清理旧配置。
 
 Workshop Laborers（劳动者）是这条路径的回归样本，包含四套外观和四条加工配方。`Processor` 中重复的 `Worker` 字段由移动版原生生产加载器读取，决定可操作该配方的角色；`ProductionRule` 中的同名字段没有对应注册项，不应依靠它限制搬运人员。
+
+Lua 对象模块提供 `Object.CancelJob(object, jobName)`，按对象的完整唯一编号和任务名取消自定义任务。也支持对象全局名称及省略对象时的当前对象；与其他对象、其他任务名或普通建造任务匹配的条目保持原状。Manufactury 4.0 的种植控制器和作物回调使用此接口。
+
+手机版行政树会在原 JSON 节点后追加已加载的模组研究，沿用原生研究编号、费用和前置条件。新增节点优先放到前置研究下方的空位，避免覆盖原版节点和关闭按钮；标题与说明继续使用模组语言文件中的研究键。
+
+本地 Manufactury 4.0 样本还有两处引用笔误：补助父名称 `Grant_M4_Cotton_Production` 应为 `Grant_M4_CottonProduction`，作物回调中的任务名 `M4_RemoveStruckGardenPlant` 应为 `M4_RemoveStruckCottonPlant`。可生成单独的修正版，保留原 ZIP 和所有贴图：
+
+```text
+python game/build_manufactury_update.py fixtures/mods/mods_Manufactury_4_0.zip build/mods_Manufactury_4_0_compatible.zip
+```
 
 `sprites.png` 高度不必是 32 的倍数。打包器把占位矩形补齐到整格，并按原生 Blit 的底边对齐方式放置 PNG；顶部的空行参与精灵坐标。例如劳动者的 300 像素图集占 320 像素高，顶部保留 20 像素，避免截断头部或取到相邻变体。
 
