@@ -9,6 +9,8 @@
 /tools/
 /build/
 /signing/
+/.tmp/
+/build-logic/bin/
 *.apk
 *.obb
 *.aab
