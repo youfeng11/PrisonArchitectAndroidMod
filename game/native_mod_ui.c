@@ -1,4 +1,4 @@
-/* Mod research compatibility for the tablet interface. */
+/* Mod compatibility fixes for the tablet's research and program interfaces. */
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -135,4 +135,28 @@ void read_mod_research_json(int location, const GameString *path, JsonValue *roo
         json_destroy(&entry);
         if (icon.short_size & 1) delete_object((void *)icon.long_string.data);
     }
+}
+
+typedef struct { void *widget, *control; } SharedWidget;
+extern void original_program_entry(SharedWidget *, void *, const void *);
+extern void widget_child(SharedWidget *, void *, const GameString *);
+extern void widget_consume_input(void *, bool);
+extern void release_widget_reference(void *);
+
+static void allow_parent_gestures(void *root, const char *name) {
+    unsigned length = strlen(name);
+    GameString key = {.long_string = {((length + 2) & ~1u) | 1u, length, name}};
+    SharedWidget child = {0};
+    widget_child(&child, root, &key);
+    if (child.widget) widget_consume_input(child.widget, false);
+    if (child.control) release_widget_reference(child.control);
+}
+
+void create_scrollable_program_entry(SharedWidget *result, void *screen, const void *title) {
+    original_program_entry(result, screen, title);
+    /* Keep native enabled states and click delegates. Only let gestures bubble
+     * to the enclosing ScrollView, including drags beginning on disabled rows. */
+    widget_consume_input(result->widget, false);
+    allow_parent_gestures(result->widget, "ReportsTabContentButton");
+    allow_parent_gestures(result->widget, "NewProgramsDisabledInputs");
 }

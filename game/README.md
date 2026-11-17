@@ -13,7 +13,7 @@
 | 回归编排 | `GameChecks`，调用本目录的 `verify_*.py` |
 | 原生模组行为 | `native_sprite_replacements.c`、`register_object_sprites.S` |
 | Lua 接口兼容 | `native_mod_lua.c` |
-| 手机版模组研究界面 | `native_mod_ui.c` |
+| 手机版研究与方案界面 | `native_mod_ui.c` |
 | 版本定义 | `profiles/v49.json`，Python 经 `patch_profile.py` 读取 |
 | Android 文件与模组操作 | `obb-bridge/NativeModStore.java`、`ModArchive.java`、`MaterialDefinitionRepair.java` |
 
@@ -110,6 +110,8 @@ Workshop Laborers（劳动者）是这条路径的回归样本，包含四套外
 Lua 对象模块提供 `Object.CancelJob(object, jobName)`，按对象的完整唯一编号和任务名取消自定义任务。也支持对象全局名称及省略对象时的当前对象；与其他对象、其他任务名或普通建造任务匹配的条目保持原状。Manufactury 4.0 的种植控制器和作物回调使用此接口。
 
 手机版行政树会在原 JSON 节点后追加已加载的模组研究，沿用原生研究编号、费用和前置条件。新增节点优先放到前置研究下方的空位，避免覆盖原版节点和关闭按钮；标题与说明继续使用模组语言文件中的研究键。
+
+「新方案」左侧条目会将拖动事件传给原生滚动容器，避免新增方案超出视口后无法访问。条目按钮和未解锁提示仍沿用原生逻辑；`verify_native_program_scroll.py` 检查工厂调用、输入传递及临时引用释放。
 
 本地 Manufactury 4.0 样本还有两处引用笔误：补助父名称 `Grant_M4_Cotton_Production` 应为 `Grant_M4_CottonProduction`，作物回调中的任务名 `M4_RemoveStruckGardenPlant` 应为 `M4_RemoveStruckCottonPlant`。可生成单独的修正版，保留原 ZIP 和所有贴图：
 

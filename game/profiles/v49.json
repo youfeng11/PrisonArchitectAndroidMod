@@ -387,6 +387,13 @@
       "research_item": "0xa44e74",
       "research_item_count": "0xa44500",
       "read_research_json_original": "0x3ac79c"
+    },
+    "PROGRAM_ENTRY_HOOK": "0x6b35c0",
+    "PROGRAM_UI_IMPORTS": {
+      "original_program_entry": "0x6b3d7c",
+      "widget_child": "0x3abc38",
+      "widget_consume_input": "0x7003e8",
+      "release_widget_reference": "0x3abc50"
     }
   },
   "linkSymbols": {
@@ -562,7 +569,11 @@
     "json_real": "0xb9e188",
     "research_item": "0xa44e74",
     "research_item_count": "0xa44500",
-    "read_research_json_original": "0x3ac79c"
+    "read_research_json_original": "0x3ac79c",
+    "original_program_entry": "0x6b3d7c",
+    "widget_child": "0x3abc38",
+    "widget_consume_input": "0x7003e8",
+    "release_widget_reference": "0x3abc50"
   },
   "patches": [
     {
@@ -1215,6 +1226,13 @@
       "address": "0x461da0",
       "expected": "0xebfd2a7d",
       "target": "read_mod_research_json",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x6b35c0",
+      "expected": "0xebf43d88",
+      "target": "create_scrollable_program_entry",
       "link": true,
       "condition": 14
     }

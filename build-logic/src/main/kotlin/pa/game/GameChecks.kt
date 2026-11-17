@@ -27,6 +27,7 @@ internal class GameChecks(private val root: File, sdk: File, private val python:
         if (mode == "smoke") scan += "--no-mod-fixtures" else scan += listOf("--obb", obb.path)
         add("Native mod loading", "verify_native_mod_scan.py", *scan.toTypedArray())
         add("Native Lua job API", "verify_native_mod_lua.py", apk.path)
+        add("Program list gestures", "verify_native_program_scroll.py", apk.path)
         add("Bundled resources and startup", "verify_offline_game.py", apk.path, obb.path, tools.android("aapt").path,
             "--project-version", projectVersion)
         add("Mod texture color quality", "verify_native_quantization.py", apk.path)
