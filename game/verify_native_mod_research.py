@@ -10,10 +10,10 @@ from zipfile import ZipFile
 from elftools.elf.elffile import ELFFile
 from unicorn import Uc, UC_ARCH_ARM, UC_MODE_ARM, UC_HOOK_CODE
 from unicorn.arm_const import (
-    UC_ARM_REG_R0, UC_ARM_REG_R1, UC_ARM_REG_R2, UC_ARM_REG_R3,
+    UC_ARM_REG_R0, UC_ARM_REG_R1, UC_ARM_REG_R2, UC_ARM_REG_R3, UC_ARM_REG_R10,
     UC_ARM_REG_SP, UC_ARM_REG_PC, UC_ARM_REG_LR, UC_ARM_REG_C1_C0_2, UC_ARM_REG_FPEXC,
 )
-from patch_profile import LIBRARY, MOD_RESEARCH_JSON_HOOK, MOD_RESEARCH_IMPORTS, NATIVE_ATLAS_IMPORTS, SPRITE_REPLACEMENT_IMPORTS
+from patch_profile import LIBRARY, MOD_RESEARCH_JSON_HOOK, MOD_RESEARCH_IMPORTS, NATIVE_ATLAS_IMPORTS, SPRITE_REPLACEMENT_IMPORTS, RESEARCH_PLACEMENT_STATE, RESEARCH_PLACEMENT_IMPORTS, RESEARCH_WIDGET_ATTACH_HOOK
 from verify_native_production import definitions
 
 BASE, ARENA = 0x10000000, 0x20000000
@@ -36,7 +36,7 @@ def verify(apk, obb, mod):
     arm.mem_map(BASE, (end + 4095) & ~4095)
     for segment in segments:
         arm.mem_write(BASE + segment['p_vaddr'], segment.data())
-    arm.mem_map(ARENA, 0x200000)
+    arm.mem_map(ARENA, 0x800000)
     arm.reg_write(UC_ARM_REG_C1_C0_2, 0xF << 20)
     arm.reg_write(UC_ARM_REG_FPEXC, 0x40000000)
     heap = HEAP
@@ -73,24 +73,36 @@ def verify(apk, obb, mod):
             put(address, 1, len(data), target)
 
     native_items = {}
-    for i, item in enumerate(all_items):
-        if not item: continue
-        pointer = alloc(0x50)
-        game_string(pointer, item['Name'])
-        put(pointer + 0x18, 2, ids.get(item.get('Requires'), 0), 2, 0, int(item.get('Cost', 0)) & 0xFFFFFFFF)
-        native_items[i] = pointer
+
+    def install_items():
+        native_items.clear()
+        for i, item in enumerate(all_items):
+            if not item: continue
+            pointer = alloc(0x50)
+            game_string(pointer, item['Name'])
+            put(pointer + 0x18, 2, ids.get(item.get('Requires'), 0), 2, 0, int(item.get('Cost', 0)) & 0xFFFFFFFF)
+            native_items[i] = pointer
+
+    install_items()
 
     imported = {BASE + address: name for name, address in MOD_RESEARCH_IMPORTS.items()}
-    imported.update({BASE + NATIVE_ATLAS_IMPORTS[n]: n for n in ('new_array', 'delete_array', 'delete_object', 'copy_bytes')})
+    imported.update({BASE + NATIVE_ATLAS_IMPORTS[n]: n for n in ('new_array', 'delete_array', 'delete_object', 'copy_bytes', 'debug_log')})
+    imported.update({BASE + address: name for name, address in RESEARCH_PLACEMENT_IMPORTS.items()})
     imported[BASE + SPRITE_REPLACEMENT_IMPORTS['strlen']] = 'strlen'
     count = len(all_items)
+    widget_id, added, scaled = 0, [], []
+    parent_widget, shared_widget, element = ARENA + 0x7000, ARENA + 0x7100, ARENA + 0x7200
+    widget = ARENA + 0x7300
+    put(shared_widget, widget, 0)
 
     def intercept(uc, address, _size, _data):
         name = imported.get(address)
         if not name: return
         a, b, c, d = (uc.reg_read(reg) for reg in (UC_ARM_REG_R0, UC_ARM_REG_R1, UC_ARM_REG_R2, UC_ARM_REG_R3))
         result = 0
-        if name == 'read_research_json_original': assert (a, b, c) == (2, PATH, ROOT)
+        if name == 'read_research_json_original':
+            assert (a, b, c) == (2, PATH, ROOT)
+            construct(ROOT, deepcopy(original))
         elif name == 'research_item_count': result = count
         elif name == 'research_item': result = native_items[a]
         elif name in ('json_member', 'json_index'):
@@ -115,37 +127,79 @@ def verify(apk, obb, mod):
         elif name == 'new_array': result = alloc(a)
         elif name == 'copy_bytes': uc.mem_write(a, bytes(uc.mem_read(b, c)))
         elif name == 'strlen': result = len(cstring(a).encode())
-        elif name not in ('delete_array', 'delete_object'): raise AssertionError(name)
+        elif name == 'original_add_research_widget':
+            assert (a, b) == (parent_widget, shared_widget)
+            added.append(widget_id)
+        elif name == 'research_widget_id': assert a == element; result = widget_id
+        elif name == 'scale_research_widget':
+            assert a == widget
+            scaled.append((widget_id, unpack('<ff', arm.mem_read(b, 8))))
+        elif name not in ('delete_array', 'delete_object', 'debug_log'): raise AssertionError(name)
         uc.reg_write(UC_ARM_REG_R0, result)
         uc.reg_write(UC_ARM_REG_PC, uc.reg_read(UC_ARM_REG_LR))
 
-    arm.hook_add(UC_HOOK_CODE, intercept)
+    for address in imported:
+        arm.hook_add(UC_HOOK_CODE, intercept, begin=address, end=address)
 
     def run():
         for reg, value in ((UC_ARM_REG_R0, 2), (UC_ARM_REG_R1, PATH), (UC_ARM_REG_R2, ROOT), (UC_ARM_REG_SP, STACK)):
             arm.reg_write(reg, value)
-        arm.emu_start(BASE + MOD_RESEARCH_JSON_HOOK, BASE + MOD_RESEARCH_JSON_HOOK + 4, count=2000000)
+        arm.emu_start(BASE + MOD_RESEARCH_JSON_HOOK, BASE + MOD_RESEARCH_JSON_HOOK + 4, count=500000000)
         assert arm.reg_read(UC_ARM_REG_PC) == BASE + MOD_RESEARCH_JSON_HOOK + 4
         assert arm.reg_read(UC_ARM_REG_SP) == STACK
 
-    run()
-    result = get(ROOT)['ResearchData']
-    assert result[:35] == original['ResearchData'] and len(result) == 37
-    for item, node in zip(additions, result[35:]):
-        assert node['research_name'] == 'research_' + item['Name']
-        assert node['research_description'] == 'researchtooltip_' + item['Name']
-        assert node['cost'] == abs(int(item['Cost']))
-        assert node['icon'] and not (node['ypos'] < -0.85 and node['xpos'] > 0.75)
-        for other in result:
-            if node is other: continue
-            assert abs(node['xpos'] - other['xpos']) >= 0.075 or abs(node['ypos'] - other['ypos']) >= 0.105
-    run()
-    assert len(result) == 37  # Existing nodes are not appended twice.
-    count = 36
-    construct(ROOT, deepcopy(original))
-    run()
-    assert get(ROOT) == original
-    print('Manufactury research labels, costs, stable IDs and non-overlapping tablet positions verified; base tree unchanged.')
+    def scenario(extra):
+        nonlocal heap, count, widget_id
+        heap = HEAP
+        cells.clear()
+        construct(ROOT, deepcopy(original))
+        all_items[:] = [None, *base_items, *extra]
+        ids.clear(); ids.update({item['Name']: i for i, item in enumerate(all_items) if item})
+        count = len(all_items)
+        install_items()
+        run()
+        result = deepcopy(get(ROOT)['ResearchData'])
+        base_count, scale = unpack('<If', arm.mem_read(BASE + RESEARCH_PLACEMENT_STATE, 8))
+        assert base_count == 35 and 0 < scale <= 1
+        assert result[:35] == original['ResearchData'] and len(result) == count - 1
+        for i, (item, node) in enumerate(zip(extra, result[35:]), 35):
+            assert node['research_name'] == 'research_' + item['Name']
+            assert node['research_description'] == 'researchtooltip_' + item['Name']
+            assert node['cost'] == abs(int(item.get('Cost', 0))) and node['icon']
+            x, y = node['xpos'], node['ypos']
+            assert 0.0249 <= x <= 0.965 - 0.055 * scale + 0.0001
+            assert -0.985 + 0.07 * scale - 0.0001 <= y <= -0.255 - 0.01 * scale + 0.0001
+            assert not (x + 0.0375 * scale > 0.7901 and y - 0.0525 * scale < -0.9001)
+            for j, other in enumerate(result[:i]):
+                sizes = scale + (1 if j < 35 else scale)
+                assert abs(x - other['xpos']) >= 0.0375 * sizes + 0.0008 or abs(y - other['ypos']) >= 0.0525 * sizes + 0.0008
+        run()
+        assert get(ROOT)['ResearchData'] == result
+        assert unpack('<If', arm.mem_read(BASE + RESEARCH_PLACEMENT_STATE, 8)) == (35, scale)
+        added.clear(); scaled.clear()
+        for widget_id in range(1, count):
+            for reg, value in ((UC_ARM_REG_R0, parent_widget), (UC_ARM_REG_R1, shared_widget),
+                               (UC_ARM_REG_R10, element), (UC_ARM_REG_SP, STACK)):
+                arm.reg_write(reg, value)
+            arm.emu_start(BASE + RESEARCH_WIDGET_ATTACH_HOOK, BASE + RESEARCH_WIDGET_ATTACH_HOOK + 4, count=10000)
+            assert arm.reg_read(UC_ARM_REG_SP) == STACK
+        assert added == list(range(1, count))
+        assert [id_ for id_, _ in scaled] == (list(range(36, count)) if scale < 0.999 else [])
+        assert all(abs(x - scale) < 0.0001 and abs(y - scale) < 0.0001 for _, (x, y) in scaled)
+        return result, scale
+
+    baseline, scale = scenario(additions)
+    assert scale == 1, 'The real two-node mod should retain normal size'
+    reverse, scale = scenario(list(reversed(additions)))
+    assert {n['research_name']: (n['xpos'], n['ypos']) for n in baseline[35:]} == {n['research_name']: (n['xpos'], n['ypos']) for n in reverse[35:]}
+    scenario([])
+    _, wide_scale = scenario([{'Name': f'Wide{i}', 'Requires': 'PrisonLabour', 'Cost': '-100'} for i in range(60)])
+    assert wide_scale < 1
+    chain = [{'Name': f'CrossMod{i}', 'Requires': f'CrossMod{i + 1}', 'Cost': '200'} for i in range(30)]
+    chain[-1]['Requires'] = 'PrisonLabour'
+    scenario(chain)
+    scenario([{'Name': 'CycleA', 'Requires': 'CycleB', 'Cost': '10'}, {'Name': 'CycleB', 'Requires': 'CycleA', 'Cost': '10'}])
+    print(f'Original research unchanged; Manufactury, forward parents, 60 siblings ({wide_scale:.0%} size), cross-mod chains, cycles, stable IDs and new-widget-only scaling verified.')
 
 
 if __name__ == '__main__':

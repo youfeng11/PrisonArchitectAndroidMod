@@ -14,6 +14,13 @@ typedef struct {
     int type, required, administrator, sprite, cost;
 } ResearchItem;
 typedef struct { float x, y; } Position;
+typedef struct { unsigned original_count; float scale; } ResearchPlacementState;
+typedef struct {
+    Position at;
+    unsigned parent, depth;
+    float scale;
+    bool placed;
+} ResearchPlacement;
 
 extern void read_research_json_original(int, const GameString *, JsonValue *);
 extern int research_item_count(void);
@@ -35,6 +42,8 @@ extern void *new_array(unsigned);
 extern void delete_array(void *);
 extern void delete_object(void *);
 extern void copy_bytes(void *, const void *, unsigned);
+extern ResearchPlacementState *research_placement_state(void);
+extern void debug_log(const char *, ...);
 
 static const char *text(const GameString *value) {
     return value->short_size & 1 ? value->long_string.data : (const char *)value + 1;
@@ -74,37 +83,108 @@ static Position position(JsonValue *node) {
     return (Position){json_real(json_member(node, "xpos")), json_real(json_member(node, "ypos"))};
 }
 
-static bool available(JsonValue *records, Position candidate) {
-    /* Keep the bottom-right Close button clear. The rest of the normalized
-     * grid follows the original tablet tree's icon and row spacing. */
-    if (candidate.y < -0.85f && candidate.x > 0.75f) return false;
-    unsigned count = json_size(records);
-    for (unsigned i = 0; i < count; ++i) {
-        Position occupied = position(json_index(records, i));
-        float dx = occupied.x - candidate.x, dy = occupied.y - candidate.y;
+static bool available(const ResearchPlacement *nodes, unsigned count, Position candidate, float scale) {
+    if (candidate.x < 0.025f || candidate.x > 0.965f - 0.055f * scale ||
+            candidate.y > -0.255f - 0.01f * scale || candidate.y < -0.985f + 0.07f * scale) return false;
+    /* Reserve the close button, including the new node's padded footprint. */
+    if (candidate.x + 0.0375f * scale > 0.79f && candidate.y - 0.0525f * scale < -0.90f) return false;
+    for (unsigned i = 1; i < count; ++i) {
+        if (!nodes[i].placed) continue;
+        float dx = nodes[i].at.x - candidate.x, dy = nodes[i].at.y - candidate.y;
         if (dx < 0) dx = -dx;
         if (dy < 0) dy = -dy;
-        if (dx < 0.075f && dy < 0.105f) return false;
+        float sizes = nodes[i].scale + scale;
+        if (dx < 0.0375f * sizes + 0.001f && dy < 0.0525f * sizes + 0.001f) return false;
     }
     return true;
 }
 
-static Position place_research(JsonValue *records, JsonValue *parent) {
-    static const float columns[] = {0.0408f, 0.1427f, 0.2590f, 0.3560f, 0.4606f, 0.5648f, 0.6975f, 0.8043f, 0.9050f};
-    static const float rows[] = {-0.2658f, -0.4017f, -0.5292f, -0.6524f, -0.7841f, -0.9160f};
-    Position origin = position(parent), best = {origin.x, origin.y - 0.132f};
+static void consider_slot(const ResearchPlacement *nodes, unsigned count, Position origin,
+        float target_y, float scale, Position candidate, Position *best, float *score) {
+    if (!available(nodes, count, candidate, scale)) return;
+    float dx = candidate.x - origin.x, dy = candidate.y - target_y;
+    float distance = dx * dx + 2.0f * dy * dy;
+    if (candidate.y >= origin.y) distance += 0.5f;
+    if (distance < *score) { *best = candidate; *score = distance; }
+}
+
+static bool place_research(const ResearchPlacement *nodes, unsigned count, unsigned original_count,
+        unsigned parent, float scale, Position *result) {
+    Position origin = nodes[parent].at;
+    float target_y = origin.y - 0.066f * (nodes[parent].scale + scale);
     float score = 1000000.0f;
-    for (unsigned y = 0; y < sizeof(rows) / sizeof(*rows); ++y) {
-        for (unsigned x = 0; x < sizeof(columns) / sizeof(*columns); ++x) {
-            Position candidate = {columns[x], rows[y]};
-            if (!available(records, candidate)) continue;
-            float dx = candidate.x - origin.x, dy = candidate.y - (origin.y - 0.132f);
-            float distance = dx * dx + 4.0f * dy * dy;
-            if (candidate.y >= origin.y) distance += 1.0f;
-            if (distance < score) { best = candidate; score = distance; }
+    consider_slot(nodes, count, origin, target_y, scale, (Position){origin.x, target_y}, result, &score);
+    if (score == 0) return true;
+    float x_step = 0.075f * scale + 0.004f, y_step = 0.105f * scale + 0.004f;
+    unsigned columns = (unsigned)(0.94f / x_step) + 1, rows = (unsigned)(0.74f / y_step) + 1;
+    /* Sample both grid phases and the existing branch columns. This also uses
+     * gaps between the old nine columns instead of restricting all additions
+     * to the same small list of coordinates. All collision checks use RAM. */
+    for (unsigned phase_y = 0; phase_y < 2; ++phase_y) for (unsigned row = 0; row <= rows + 2; ++row) {
+        if (phase_y && row > rows) continue;
+        float y = -0.2658f - (row + phase_y * 0.5f) * y_step;
+        if (row == rows + 1) y = -0.985f + 0.07f * scale;
+        if (row == rows + 2) y = target_y;
+        consider_slot(nodes, count, origin, target_y, scale, (Position){origin.x, y}, result, &score);
+        for (unsigned id = 1; id <= original_count; ++id)
+            consider_slot(nodes, count, origin, target_y, scale, (Position){nodes[id].at.x, y}, result, &score);
+        for (unsigned phase_x = 0; phase_x < 2; ++phase_x) for (unsigned col = 0; col <= columns; ++col) {
+            float x = 0.025f + (col + phase_x * 0.5f) * x_step;
+            consider_slot(nodes, count, origin, target_y, scale, (Position){x, y}, result, &score);
         }
     }
-    return best;
+    return score < 1000000.0f;
+}
+
+static unsigned original_ancestor(const ResearchPlacement *nodes, unsigned count, unsigned original_count, unsigned id) {
+    for (unsigned steps = 0; id > original_count && id < count && steps < count; ++steps) id = nodes[id].parent;
+    return id && id <= original_count ? id : 1;
+}
+
+static float arrange_research(ResearchPlacement *nodes, unsigned count, unsigned original_count) {
+    unsigned unresolved = count - original_count - 1, deepest = 0;
+    while (unresolved) {
+        unsigned progress = 0;
+        for (unsigned id = original_count + 1; id < count; ++id) {
+            if (nodes[id].depth != ~0u) continue;
+            unsigned parent = nodes[id].parent;
+            if (parent > original_count && nodes[parent].depth == ~0u) continue;
+            nodes[id].depth = parent > original_count ? nodes[parent].depth + 1 : 0;
+            if (nodes[id].depth > deepest) deepest = nodes[id].depth;
+            --unresolved;
+            ++progress;
+        }
+        if (!progress) for (unsigned id = original_count + 1; id < count; ++id) {
+            if (nodes[id].depth != ~0u) continue;
+            /* Break only placement traversal for cyclic prerequisites. The
+             * actual ResearchSystem prerequisite and ID remain untouched. */
+            nodes[id].depth = 0;
+            --unresolved;
+            break;
+        }
+    }
+    float scale = 1.0f;
+    for (;;) {
+        for (unsigned id = original_count + 1; id < count; ++id) {
+            nodes[id].placed = false;
+            nodes[id].scale = scale;
+        }
+        bool fits = true;
+        for (unsigned depth = 0; depth <= deepest && fits; ++depth) {
+            for (unsigned id = original_count + 1; id < count; ++id) {
+                if (nodes[id].depth != depth) continue;
+                unsigned parent = nodes[id].parent;
+                if (!parent || !nodes[parent].placed) parent = original_ancestor(nodes, count, original_count, id);
+                if (!place_research(nodes, count, original_count, parent, scale, &nodes[id].at)) {
+                    fits = false;
+                    break;
+                }
+                nodes[id].placed = true;
+            }
+        }
+        if (fits) return scale;
+        scale *= 0.9f;
+    }
 }
 
 void read_mod_research_json(int location, const GameString *path, JsonValue *root) {
@@ -112,15 +192,28 @@ void read_mod_research_json(int location, const GameString *path, JsonValue *roo
     JsonValue *records = json_member(root, "ResearchData");
     if (!json_is_array(records)) return;
     unsigned original_count = json_size(records);
+    ResearchPlacementState *state = research_placement_state();
+    *state = (ResearchPlacementState){original_count, 1.0f};
     if (!original_count) return;
     /* The stock loader assigns research IDs in JSON order starting at one.
      * ResearchSystem appends new definitions after these built-in IDs. */
     unsigned count = research_item_count();
+    if (count <= original_count + 1) return;
+    ResearchPlacement *nodes = new_array(sizeof(*nodes) * count);
+    for (unsigned id = 1; id < count; ++id) {
+        int parent = research_item(id)->required;
+        nodes[id].parent = parent > 0 && (unsigned)parent < count && (unsigned)parent != id ? (unsigned)parent : 0;
+        nodes[id].depth = id <= original_count ? 0 : ~0u;
+        nodes[id].scale = 1.0f;
+        nodes[id].placed = id <= original_count;
+        if (id <= original_count) nodes[id].at = position(json_index(records, id - 1));
+    }
+    state->scale = arrange_research(nodes, count, original_count);
     for (unsigned id = original_count + 1; id < count; ++id) {
         const ResearchItem *item = research_item(id);
-        unsigned parent_id = item->required > 0 && (unsigned)item->required <= json_size(records) ? item->required : 1;
+        unsigned parent_id = original_ancestor(nodes, count, original_count, id);
         JsonValue *parent = json_index(records, parent_id - 1);
-        Position slot = place_research(records, parent);
+        Position slot = nodes[id].at;
         GameString icon = {0};
         json_text(&icon, json_member(parent, "icon"));
         JsonValue entry;
@@ -134,6 +227,22 @@ void read_mod_research_json(int location, const GameString *path, JsonValue *roo
         json_append(records, &entry);
         json_destroy(&entry);
         if (icon.short_size & 1) delete_object((void *)icon.long_string.data);
+    }
+    if (state->scale < 0.999f) debug_log("PATools research: fitted %u added nodes at %u%% of original size\n",
+        count - original_count - 1, (unsigned)(state->scale * 100));
+    delete_array(nodes);
+}
+
+extern void original_add_research_widget(void *, const void *);
+extern unsigned research_widget_id(const void *);
+extern void scale_research_widget(void *, const Position *);
+
+void add_sized_research_widget(void *parent, const void *shared_widget, const void *element) {
+    original_add_research_widget(parent, shared_widget);
+    const ResearchPlacementState *state = research_placement_state();
+    if (state->scale < 0.999f && research_widget_id(element) > state->original_count) {
+        void *widget = *(void *const *)shared_widget;
+        scale_research_widget(widget, &(Position){state->scale, state->scale});
     }
 }
 

@@ -182,6 +182,19 @@ default_staff_slot:
     bx lr
 .Ldefault_staff_offset: .word default_staff_state - .Ldefault_staff_offset
 
+.global research_placement_state
+research_placement_state:
+    adr r0, .Lresearch_placement_offset
+    ldr r1, [r0]
+    add r0, r0, r1
+    bx lr
+.Lresearch_placement_offset: .word research_placement_data - .Lresearch_placement_offset
+
+.global add_sized_research_widget_hook
+add_sized_research_widget_hook:
+    mov r2, r10                @ v49 LoadResearchFromJson's current element
+    b add_sized_research_widget
+
 .global construct_default_staff_hook
 construct_default_staff_hook:
     mov r0, r4

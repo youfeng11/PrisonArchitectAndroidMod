@@ -394,6 +394,14 @@
       "widget_child": "0x3abc38",
       "widget_consume_input": "0x7003e8",
       "release_widget_reference": "0x3abc50"
+    },
+    "RESEARCH_PLACEMENT_STATE": "0xf7a71c",
+    "RESEARCH_PLACEMENT_STATE_SIZE": "0x8",
+    "RESEARCH_WIDGET_ATTACH_HOOK": "0x462030",
+    "RESEARCH_PLACEMENT_IMPORTS": {
+      "original_add_research_widget": "0x701820",
+      "research_widget_id": "0x45ff28",
+      "scale_research_widget": "0x6ffba0"
     }
   },
   "linkSymbols": {
@@ -573,7 +581,11 @@
     "original_program_entry": "0x6b3d7c",
     "widget_child": "0x3abc38",
     "widget_consume_input": "0x7003e8",
-    "release_widget_reference": "0x3abc50"
+    "release_widget_reference": "0x3abc50",
+    "original_add_research_widget": "0x701820",
+    "research_widget_id": "0x45ff28",
+    "scale_research_widget": "0x6ffba0",
+    "research_placement_data": "0xf7a71c"
   },
   "patches": [
     {
@@ -1233,6 +1245,13 @@
       "address": "0x6b35c0",
       "expected": "0xebf43d88",
       "target": "create_scrollable_program_entry",
+      "link": true,
+      "condition": 14
+    },
+    {
+      "address": "0x462030",
+      "expected": "0xebfd2811",
+      "target": "add_sized_research_widget_hook",
       "link": true,
       "condition": 14
     }

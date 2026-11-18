@@ -62,7 +62,7 @@ internal class NativePatcher(private val tools: Toolchain, private val profile: 
         val size = image.i32(writable + 20)
         require(image.i32(writable + 24) == 6 && address + size == profile.address("BANK_BASELINE"))
         val stateSize = profile.address("BANK_BASELINE_SIZE") + profile.address("NATIVE_ATLAS_STATE_SIZE") + 16 +
-            profile.address("DEFAULT_STAFF_STATE_SIZE")
+            profile.address("DEFAULT_STAFF_STATE_SIZE") + profile.address("RESEARCH_PLACEMENT_STATE_SIZE")
         image.put32(writable + 20, (size + stateSize).toLong())
         val bankAddress = profile.address("BANK_CODE")
         val alignment = profile.address("SEGMENT_ALIGNMENT")
